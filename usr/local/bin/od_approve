@@ -99,7 +99,7 @@ $sth->finish;
 
 ## Log this approval attempt, and the current project status.
 ##
-$sqlstm = sprintf("INSERT INTO od_approve_log (request_id, approver_id, email, request_status) VALUES ($request_id, $approver_id, %s, $req_status)", $dbh->quote($from));
+$sqlstm = sprintf("INSERT INTO od_approve_log (request_id, approver_id, email, request_status) VALUES ($request_id, $approver_id, %s, '$req_status')", $dbh->quote($from));
 #print $sqlstm, "\n";
 $sth = $dbh->prepare ($sqlstm);
 $sth->execute;
