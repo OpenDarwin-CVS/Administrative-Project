@@ -76,7 +76,7 @@ if ($pid == 0) {
 
                 # Update the authorized_keys file.
                 $ENV{'OD_USER_NAME'} = $user;
-                $ENV{'OD_PASSWORD'} = undef;
+                #$ENV{'OD_PASSWORD'} = undef;
                 `/usr/local/bin/od_set_sshkey`;
 	}
 }
