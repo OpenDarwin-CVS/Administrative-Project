@@ -229,16 +229,19 @@ if ($req_type eq "user")
 		##
 		## Mail the user notification of their new account.
 
-		#print "SELECT email FROM od_users WHERE user_id=$req_user\n";
-		$sth = $dbh->prepare("SELECT email FROM od_users WHERE user_id=$req_user");
+		#print "SELECT email,realname FROM od_users WHERE user_id=$req_user\n";
+		$sth = $dbh->prepare("SELECT email,realname FROM od_users WHERE user_id=$req_user");
 		$sth->execute;
-		($user_email) = $sth->fetchrow_array ();
+		($user_email,$realname) = $sth->fetchrow_array ();
 		$sth->finish;	
 
 		open BODY, "</usr/local/bin/od_approve_user.txt" or die $!;
 		open MAIL, "|/usr/sbin/sendmail $user_email core\@opendarwin.org" or die $!;
 		print MAIL "To: $user_email\n";
-		while (<BODY>) { print MAIL; }
+		while (<BODY>) { 
+			s/%realname%/$realname/g;
+			print MAIL; 
+		}
 		close MAIL;
 		close BODY;
 	}
@@ -321,6 +324,25 @@ if ($req_type eq "user")
 		$ENV{'OD_UID'}=$unix_uid;
 		$ENV{'OD_GID'}=$unix_gid;
 		exec "/usr/local/bin/od_joingroup"
+
+                ##
+                ## Mail the user notification of their new project.
+
+		$sth = $dbh->prepare ("SELECT u.email,u.realname,p.name FROM od_users u, od_projects p WHERE p.project_id=$proj_id AND u.user_id=$req_user");
+                $sth->execute;
+                ($user_email,$realname,$projname) = $sth->fetchrow_array ();
+                $sth->finish;
+
+                open BODY, "</usr/local/bin/od_approve_project.txt" or die $!;
+                open MAIL, "|/usr/sbin/sendmail $user_email core\@opendarwin.org" or die $!;
+                print MAIL "To: $user_email\n";
+                while (<BODY>) {
+                        s/%realname%/$realname/g;
+			s/%projname%/$projname/g;
+                        print MAIL;  
+                }
+                close MAIL;
+                close BODY;
 	}
 		exit 0;
 # End of "project" request type.
@@ -365,6 +387,26 @@ if ($req_type eq "user")
 			$ENV{'OD_UID'}=$unix_uid;
 			$ENV{'OD_GID'}=$unix_gid;
 			system "/usr/local/bin/od_joingroup"
+
+			##
+	                ## Mail the user notification of their new project.
+
+                	$sth = $dbh->prepare ("SELECT u.email,u.realname,p.name FROM od_users u, od_projects p WHERE p.project_id=$proj_id AND u.user_id=$mbr_id");
+			$sth->execute;
+			($user_email,$realname,$projname) = $sth->fetchrow_array ();
+			$sth->finish;
+
+			open BODY, "</usr/local/bin/od_approve_join.txt" or die $!;
+			open MAIL, "|/usr/sbin/sendmail $user_email core\@opendarwin.org" or die $!;
+			print MAIL "To: $user_email\n";
+			while (<BODY>) {
+				s/%realname%/$realname/g;
+				s/%projname%/$projname/g;
+                        	print MAIL;
+                	}
+                	close MAIL;
+                	close BODY;
+
 		}
 		
 		exit 0;
