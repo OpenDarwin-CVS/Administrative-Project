@@ -1,0 +1,57 @@
+#!/usr/bin/perl -U
+##
+## od_set_sshkey
+## Kevin Van Vechten | kevin@opendarwin.org
+##
+## This script performs an authentication check of the specified
+## username and password combination, and if successful, will
+## place the email address found in the od_user table into a
+## .forward file in the user's home directory.
+##
+## Note: This script operates on the local NetInfo domain.
+##
+## C O M M A N D  L I N E   A R G U M E N T S 
+##
+$user     = $ENV{'OD_USER_NAME'};		# login name
+$passwd   = $ENV{'OD_PASSWORD_MD5'};		# md5 of password
+
+##
+## C O N S T A N T S
+##
+
+die "Invalid user name: $user" if !$user or ($user =~ m/[^A-Z0-9_]/i);
+die "Invalid password md5: $passwd" if !$passwd or ($passwd =~ m/[^A-F0-9]/i);
+
+open NIUTIL, "niutil -readprop / /users/$user home |" or die "Cannot find home for $user: $!";
+chomp($home = <NIUTIL>);
+close NIUTIL;
+
+use DBI;
+
+my ($dsn) = "DBI:mysql:OpenDarwin:localhost";
+my ($user_name, $password);
+my ($dbh,$sth);
+my (@ary);
+
+my $secret = "/var/opendarwin/secrets/od_approve_secret";
+open OD_SECRET, $secret or die "$secret: $!\n";                  
+chomp($user_name = <OD_SECRET>);
+chomp($password = <OD_SECRET>);
+close OD_SECRET;
+
+$dbh = DBI->connect ($dsn, $user_name, $password, {RaiseError => 1});
+
+$sth = $dbh->prepare ("SELECT email, forward FROM od_users WHERE name='$user' AND password='$passwd'");
+$sth->execute;
+($email, $forward) = $sth->fetchrow_array ();
+$sth->finish;
+
+if (defined($email) && defined($forward) && $forward) {
+    $> = $unix_uid; # write the .forward file using the users' uid.
+    $file = ".forward";
+    open FORWARD, ">$home/$file" or die "cannot open $home/$file: $!";
+	print FORWARD "$email\n";
+    close FORWARD;
+}
+
+exit 0;
