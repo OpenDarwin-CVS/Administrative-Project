@@ -24,6 +24,7 @@ die "Invalid user name: $user" if !$user or ($user =~ m/[^A-Z0-9_]/i);
 die "Must be run as root.\n" if $> != 0;
 
 use DBI;
+use Digest::MD5 qw(md5_hex);
 
 my ($dsn) = "DBI:mysql:OpenDarwin:localhost";
 my ($user_name, $password);
@@ -59,7 +60,10 @@ if ($password1 ne $password2) {
     exit 1;
 } else {
     # Update the database.
-    $sth = $dbh->prepare("UPDATE od_users SET password=md5($password1) WHERE user_id=$user_id");
+    chomp($password1);
+    my $digest = md5_hex($password1);
+print "digest: $digest\n";
+    $sth = $dbh->prepare("UPDATE od_users SET password='$digest' WHERE user_id='$user_id'");
     $sth->execute;
     $sth->finish;
 
