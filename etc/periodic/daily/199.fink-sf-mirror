@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cd /Volumes/ServerHD/fink
+~bbraun/wget -q --mirror http://unc.dl.sourceforge.net/fink 2>&1 > /dev/null
+find /Volumes/ServerHD/fink/fink/ -name "index.html*" -exec rm {} \;
+find /Volumes/ServerHD/fink/fink/ -name "index.php" -exec rm {} \;

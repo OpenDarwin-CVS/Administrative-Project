@@ -1,0 +1,4 @@
+#!/bin/sh
+gzip -d -c /Volumes/ServerHD/fink/unc.dl.sourceforge.net/fink/direct_download/dists/10.2/current/main/binary-darwin-powerpc/Packages.gz > /Volumes/ServerHD/fink/unc.dl.sourceforge.net/fink/direct_download/dists/10.2/current/main/binary-darwin-powerpc/Packages
+gzip -d -c /Volumes/ServerHD/fink/unc.dl.sourceforge.net/fink/direct_download/dists/10.2/release/main/binary-darwin-powerpc/Packages.gz > /Volumes/ServerHD/fink/unc.dl.sourceforge.net/fink/direct_download/dists/10.2/release/main/binary-darwin-powerpc/Packages
+/sw/share/popularity-contest/scripts/popcon-process.sh
