@@ -55,6 +55,7 @@ $sth->execute;
 ($is_admin) = $sth->fetchrow_array();
 $sth->finish;
 $command = $is_admin ? "" : "command=\"/usr/bin/cvs server\" ";
+$sftpcommand = $is_admin ? "" : "command=\"/usr/libexec/sftp-server\" ";
 
 if (defined($ssh_key)) {
     $> = $unix_uid; # write the key file using the users' uid.
@@ -63,6 +64,12 @@ if (defined($ssh_key)) {
 	@keys = split(/\n/, $ssh_key);
 	foreach $key (@keys) {
 		print KEYS $command . $key . "\n";
+	}
+    close KEYS;
+    open KEYS, ">$home/.sftp/$key_file" or die "cannot open $home/.sftp/$key_file: $!";
+	@keys = split(/\n/, $ssh_key);
+	foreach $key (@keys) {
+		print KEYS $sftpcommand . $key . "\n";
 	}
     close KEYS;
 }

@@ -78,8 +78,10 @@ print $home, "\n";
 
 mkdir $home, 0755;
 mkdir "$home/.ssh", 0755;	
+mkdir "$home/.sftp", 0755;	
 chown $uid, $default_gid, $home;
 chown $uid, $default_gid, "$home/.ssh";
+chown $uid, $default_gid, "$home/.sftp";
 
 exit 0;
 
