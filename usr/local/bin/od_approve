@@ -225,6 +225,22 @@ if ($req_type eq "user")
 			print KEYS $ssh_key, "\n";
 			close KEYS;
 		}
+
+		##
+		## Mail the user notification of their new account.
+
+		#print "SELECT email FROM od_users WHERE user_id=$req_user\n";
+		$sth = $dbh->prepare("SELECT email FROM od_users WHERE user_id=$req_user");
+		$sth->execute;
+		($user_email) = $sth->fetchrow_array ();
+		$sth->finish;	
+
+		open BODY, "</usr/local/bin/od_approve_user.txt" or die $!;
+		open MAIL, "|/usr/sbin/sendmail $user_email" or die $!;
+		print MAIL "To: $user_email\n";
+		while (<BODY>) { print MAIL; }
+		close MAIL;
+		close BODY;
 	}
 	
 	exit 0;
