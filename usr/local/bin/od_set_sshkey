@@ -40,7 +40,7 @@ close OD_SECRET;
 
 $dbh = DBI->connect ($dsn, $user_name, $password, {RaiseError => 1});
 
-$psql = defined($passwd) ? "AND password=md5('" . $dbh->quote($passwd) . "')" : "";
+$psql = defined($passwd) ? "AND password=md5(" . $dbh->quote($passwd) . ")" : "";
 $sth = $dbh->prepare ("SELECT ssh_key, unix_uid, user_id FROM od_users WHERE name='$user' $psql");
 $sth->execute;
 ($ssh_key, $unix_uid, $user_id) = $sth->fetchrow_array ();

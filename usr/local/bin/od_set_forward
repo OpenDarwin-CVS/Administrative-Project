@@ -40,7 +40,7 @@ close OD_SECRET;
 
 $dbh = DBI->connect ($dsn, $user_name, $password, {RaiseError => 1});
 
-$psql = defined($passwd) ? "AND password=md5('" . $dbh->quote($passwd) . "')" : "";
+$psql = defined($passwd) ? "AND password=md5(" . $dbh->quote($passwd) . ")" : "";
 $sth = $dbh->prepare ("SELECT unix_uid, email, forward FROM od_users WHERE name='$user' $psql");
 $sth->execute;
 ($unix_uid, $email, $forward) = $sth->fetchrow_array ();
