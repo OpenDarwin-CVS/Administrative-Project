@@ -9,7 +9,7 @@ Your account has been approved.  For information about using your OpenDarwin CVS
 account and general guidelines about the organization of OpenDarwin's
 repository, please review the following pages:
 
-http://www.opendarwin.org/committer_guide.shtml
-http://www.opendarwin.org/cvs_guidelines.shtml 
+http://www.opendarwin.org/en/committer_guide.php
+http://www.opendarwin.org/en/cvs_guidelines.php
 
 Welcome to the OpenDarwin team!
