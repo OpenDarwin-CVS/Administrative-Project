@@ -1,0 +1,18 @@
+# Common setup for backup scripts.
+# Kevin Van Vechten | kevin@opendarwin.org
+
+PATH=/usr/bin:/bin
+
+umask 077
+
+RotateBackups ()
+{
+    local FILE="$1"
+
+    [ -f $FILE.9 ] && rm $FILE.9
+    for NUM in 8 7 6 5 4 3 2 1
+    do
+            [ -f $FILE.$NUM ] && mv $FILE.$NUM $FILE.$((NUM+1))
+    done
+    [ -f $FILE ] && mv $FILE $FILE.1
+}

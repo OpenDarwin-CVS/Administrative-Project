@@ -1,8 +1,9 @@
-# lamancha /etc makefile
+# /etc makefile
 # Kevin Van Vechten | kevin@opendarwin.org
 
-ETC_THINGS = adduser.conf backup-lamancha-common crontab hostconfig inetd.conf named.conf rsyncd.conf shells ssh_config sshd_config
-EXE_THINGS = backup-lamancha-daily backup-lamancha-monthly backup-lamancha-weekly
+HOST = $(shell hostname -s)
+ETC_THINGS = adduser.conf backup-common crontab hostconfig inetd.conf named.conf rsyncd.conf shells ssh_config sshd_config
+EXE_THINGS = backup-${HOST}-daily backup-${HOST}-monthly backup-${HOST}-weekly
 SUBDIRS = httpd mail
 PRODUCTS = ${ETC_THINGS} ${EXE_THINGS} ${SUBDIRS}
 INSTALL_DIR = /etc
@@ -22,7 +23,7 @@ httpd:
 all:	${PRODUCTS}
 
 install:	all
-	${INSTALLER} -cp -o ${ETC_OWNER} -g ${ETC_GROUP} -m ${ETC_PRIVS} ${ETC_THINGS} ${INSTALL_DIR}
+#	${INSTALLER} -cp -o ${ETC_OWNER} -g ${ETC_GROUP} -m ${ETC_PRIVS} ${ETC_THINGS} ${INSTALL_DIR}
 	${INSTALLER} -cp -o ${ETC_OWNER} -g ${ETC_GROUP} -m ${EXE_PRIVS} ${EXE_THINGS} ${INSTALL_DIR}
 	$(MAKE) -C httpd install
 	$(MAKE) -C mail install
