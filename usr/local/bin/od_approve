@@ -135,7 +135,7 @@ if (!$req_a_approve)
 		($admin_status) = $sth->fetchrow_array ();
 		$sth->finish;
 	} else {
-		$sqlstr = "select a.status from od_project_admins a, od_request_projects r where r.request_id=70 and a.project_id=r.project_id and a.user_id=1";
+		$sqlstm = "select a.status from od_project_admins a, od_request_projects r where r.request_id=$request_id and a.project_id=r.project_id and a.user_id=$approver_id";
 		$sth = $dbh->prepare( $sqlstm );
 		$sth->execute;
                 ($admin_status) = $sth->fetchrow_array ();
