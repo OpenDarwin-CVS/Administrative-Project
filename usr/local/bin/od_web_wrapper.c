@@ -41,17 +41,8 @@ int main(int argc, char* argv[], char* envp[] )
 	int option = atoi(argv[1]);
 	switch (option) {
   	   case 1:
-		file_to_run = "/usr/local/bin/od_approve";
-		break;
-  	   case 2:
-		file_to_run = "/usr/local/bin/od_adduser";
-		break;
-	   case 3:
-		file_to_run = "/usr/local/bin/od_newproj";
-		break;
-	   case 4:
-		file_to_run = "/usr/local/bin/od_joingroup";
-		break;
+                file_to_run = "/usr/local/bin/od_set_sshkey";
+                break;
 	   default:
 		exit -1;
 	}

@@ -13,12 +13,14 @@
 ## C O M M A N D  L I N E   A R G U M E N T S 
 ##
 $user     = $ENV{'OD_USER_NAME'};		# login name
+$passwd   = $ENV{'OD_PASSWORD_MD5'};		# md5 of password
 
 ##
 ## C O N S T A N T S
 ##
 
-die "Invalid user name: $user" if !$user or ( $user =~ s/[^A-Za-z0-9_]// );
+die "Invalid user name: $user" if !$user or ($user =~ s/[^A-Z0-9_]//i);
+die "Invalid password md5: $passwd" if !$passwd or ($passwd =~ s/[^A-F0-9]//i);
 
 open NIUTIL, "niutil -readprop / /users/$user home |" or die "Cannot find home for $user: $!";
 chomp($home = <NIUTIL>);
@@ -38,7 +40,7 @@ close OD_SECRET;
 
 $dbh = DBI->connect ($dsn, $user_name, $password, {RaiseError => 1});
 
-$sth = $dbh->prepare ("SELECT ssh_key FROM od_users WHERE name='$user'");
+$sth = $dbh->prepare ("SELECT ssh_key FROM od_users WHERE name='$user' AND password='$password'");
 $sth->execute;
 ($ssh_key) = $sth->fetchrow_array ();
 $sth->finish;

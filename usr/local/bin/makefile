@@ -28,15 +28,18 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-ADMIN_THINGS = od_activate_lists od_adduser od_approve od_joingroup od_newproj od_wrapper od_set_sshkey
+ADMIN_THINGS = od_activate_lists od_adduser od_approve od_joingroup od_newproj od_wrapper
 MAIL_LIST_THINGS = od_create_lists
-PRODUCTS = ${ADMIN_THINGS} ${MAIL_LIST_THINGS}
-WRAPPER_THINGS = od_wrapper od_create_lists
+WEB_THINGS = od_set_sshkey od_web_wrapper
+PRODUCTS = ${ADMIN_THINGS} ${MAIL_LIST_THINGS} ${WEB_THINGS}
+WRAPPER_THINGS = od_wrapper od_create_lists od_web_wrapper
 INSTALL_DIR = /usr/local/bin
 ADMIN_OWNER = root
 ADMIN_GROUP = daemon
 MAIL_LIST_OWNER = mailman
 MAIL_LIST_GROUP = daemon
+WEB_OWNER = root
+WEB_GROUP = www
 INSTALL_PRIVS = 750
 WRAPPER_PRIVS = 4750
 INSTALLER = /usr/bin/install
@@ -45,8 +48,11 @@ all:	${PRODUCTS}
 
 od_wrapper:	od_wrapper.c
 
+od_web_wrapper: od_web_wrapper.c
+
 install:	all
 	${INSTALLER} -c -o ${ADMIN_OWNER} -g ${ADMIN_GROUP} -m ${INSTALL_PRIVS} ${ADMIN_THINGS} ${INSTALL_DIR}
 	${INSTALLER} -c -o ${MAIL_LIST_OWNER} -g ${MAIL_LIST_GROUP} -m ${WRAPPER_PRIVS} ${MAIL_LIST_THINGS} ${INSTALL_DIR}
 	${INSTALLER} -c -o ${ADMIN_OWNER} -g ${ADMIN_GROUP} -m ${WRAPPER_PRIVS} od_wrapper ${INSTALL_DIR}
-
+	${INSTALLER} -c -o ${WEB_OWNER} -g ${WEB_GROUP} -m ${INSTALL_PRIVS} ${WEB_THINGS} ${INSTALL_DIR}
+	${INSTALLER} -c -o ${WEB_OWNER} -g ${WEB_GROUP} -m ${WRAPPER_PRIVS} od_web_wrapper ${INSTALL_DIR}
