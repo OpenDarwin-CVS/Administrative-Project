@@ -32,8 +32,8 @@
 #include <stdio.h>
 #include <errno.h>
 
-extern char *sys_errorlist;
-extern int sys_nerr;
+//extern char *sys_errorlist;
+//extern int sys_nerr;
 
  
 int main(int argc, char* argv[], char* envp[] )
