@@ -350,7 +350,7 @@ if ($req_type eq "user")
 } elsif ($req_type eq "join") {
 	
 		#If user is a member already, discard this email!
-                $sth = $dbh->prepare ("SELECT m.active_flag, m.user_id FROM od_project_members m, od_requests r WHERE r.id = $request_id AND m.user_id=r.requester_user_id");
+		$sth = $dbh->prepare ("SELECT m.active_flag, m.user_id FROM od_project_members m, od_requests r, od_request_projects rp WHERE r.id=$request_id AND m.user_id=r.requester_user_id AND m.project_id=rp.project_id AND rp.request_id=r.id");
 		$sth->execute;
 		if(($mbr_status, $mbr_id) = $sth->fetchrow_array ()){
 			if($mbr_status ne 'pending') {
@@ -378,7 +378,7 @@ if ($req_type eq "user")
                         }
                 
                 
-			$sth = $dbh->prepare ("UPDATE od_project_members SET active_flag='active'  WHERE user_id = $mbr_id");
+			$sth = $dbh->prepare ("UPDATE od_project_members SET active_flag='active' WHERE user_id=$mbr_id AND project_id=$proj_id");
 			$sth->execute;
 			$sth->finish;
 			$sth = $dbh->prepare ("SELECT u.unix_uid, p.unix_gid FROM od_users u, od_projects p WHERE p.project_id=$proj_id AND u.user_id=$mbr_id");
