@@ -40,7 +40,7 @@ close OD_SECRET;
 
 $dbh = DBI->connect ($dsn, $user_name, $password, {RaiseError => 1});
 
-$sth = $dbh->prepare ("SELECT ssh_key FROM od_users WHERE name='$user' AND password='$password'");
+$sth = $dbh->prepare ("SELECT ssh_key FROM od_users WHERE name='$user' AND password='$passwd'");
 $sth->execute;
 ($ssh_key) = $sth->fetchrow_array ();
 $sth->finish;
