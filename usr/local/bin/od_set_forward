@@ -41,17 +41,19 @@ close OD_SECRET;
 
 $dbh = DBI->connect ($dsn, $user_name, $password, {RaiseError => 1});
 
-$sth = $dbh->prepare ("SELECT email, forward FROM od_users WHERE name='$user' AND password='$passwd'");
+$sth = $dbh->prepare ("SELECT unix_uid, email, forward FROM od_users WHERE name='$user' AND password='$passwd'");
 $sth->execute;
-($email, $forward) = $sth->fetchrow_array ();
+($unix_uid, $email, $forward) = $sth->fetchrow_array ();
 $sth->finish;
 
+$> = $unix_uid; # write the .forward file using the users' uid.
+$file = ".forward";
 if (defined($email) && defined($forward) && $forward) {
-    $> = $unix_uid; # write the .forward file using the users' uid.
-    $file = ".forward";
     open FORWARD, ">$home/$file" or die "cannot open $home/$file: $!";
 	print FORWARD "$email\n";
     close FORWARD;
+} else {
+	unlink("$home/$file") or die "cannot delete $home/$file: $!";
 }
 
 exit 0;
