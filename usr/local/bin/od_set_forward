@@ -48,7 +48,7 @@ $sth->finish;
 
 $> = $unix_uid; # write the .forward file using the users' uid.
 $file = ".forward";
-if (defined($email) && defined($forward) && $forward) {
+if (defined($email) && $forward == '1') {
     open FORWARD, ">$home/$file" or die "cannot open $home/$file: $!";
 	print FORWARD "$email\n";
     close FORWARD;
