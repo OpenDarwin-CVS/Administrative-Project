@@ -33,7 +33,8 @@ my ($user_name, $password);
 my ($dbh,$sth);
 my (@ary);
 
-open OD_SECRET, "/var/od_secret" or die "/var/od_secret: $!";
+my $secret = "/var/opendarwin/secrets/od_approve_secret";
+open OD_SECRET, $secret or die "$secret: $!\n";                  
 chomp($user_name = <OD_SECRET>);
 chomp($password = <OD_SECRET>);
 close OD_SECRET;
