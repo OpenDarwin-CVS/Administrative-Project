@@ -14,6 +14,6 @@ all:	${PRODUCTS}
 
 install:	all
 	${INSTALLER} -cp -o ${HTTPD_OWNER} -g ${HTTPD_GROUP} -m ${HTTPD_PRIVS} ${HTTPD_THINGS} ${INSTALL_DIR}
-#	apachectl restart
+#	apachectl graceful
 
 clean:
