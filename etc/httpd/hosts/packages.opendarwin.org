@@ -1,0 +1,12 @@
+<VirtualHost 204.152.184.200>
+ServerName packages.opendarwin.org
+ServerAdmin bbraun@opendarwin.org
+#DocumentRoot /Library/WebServer/Documents/projects/darwinports/packages
+DocumentRoot /Volumes/src/packages
+<Directory "/Volumes/src/packages">
+    AllowOverride All
+    Options Indexes FollowSymLinks MultiViews Includes
+DAV on
+</Directory>
+</VirtualHost>
+

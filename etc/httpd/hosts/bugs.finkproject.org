@@ -1,0 +1,10 @@
+<VirtualHost 204.152.184.200>
+ServerName bugs.finkproject.org
+ServerAdmin bbraun@opendarwin.org
+DocumentRoot /Users/beren12/Sites/var/lib/debbugs/www
+ScriptAlias /cgibin/ /Users/beren12/Sites/var/lib/debbugs/www/cgi
+<Directory "/Users/beren12/Sites/var/lib/debbugs/www">
+        AllowOverride All
+        Options All ExecCGI
+</Directory>
+</VirtualHost>

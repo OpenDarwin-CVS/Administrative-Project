@@ -1,0 +1,9 @@
+<VirtualHost 204.152.184.200>
+ServerName bugzilla.opendarwin.org
+ServerAdmin bbraun@opendarwin.org
+DocumentRoot /Library/WebServer/Documents/bugzilla
+<Directory "/Library/WebServer/Documents/bugzilla">
+        AllowOverride All
+        Options All ExecCGI
+</Directory>
+</VirtualHost>

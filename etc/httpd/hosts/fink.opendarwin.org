@@ -1,0 +1,8 @@
+<VirtualHost 204.152.184.200>
+ServerName fink.opendarwin.org
+ServerAdmin bbraun@opendarwin.org
+DocumentRoot /Volumes/src/fink
+<Directory "/Volumes/src/fink">
+    Options Indexes FollowSymLinks MultiViews Includes
+</Directory>
+</VirtualHost>

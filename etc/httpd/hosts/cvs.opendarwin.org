@@ -1,0 +1,6 @@
+<VirtualHost 204.152.184.200>
+ServerName cvs.opendarwin.org
+ServerAdmin bbraun@opendarwin.org
+DocumentRoot /Library/WebServer/Documents
+Redirect / http://www.opendarwin.org/cgi-bin/cvsweb.cgi
+</VirtualHost>

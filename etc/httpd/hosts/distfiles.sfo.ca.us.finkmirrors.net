@@ -1,0 +1,5 @@
+<VirtualHost 204.152.184.200>
+ServerName distfiles.sfo.ca.us.finkmirrors.net
+Include /private/etc/httpd/distfiles.conf
+</VirtualHost>
+
