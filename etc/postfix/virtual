@@ -1,0 +1,43 @@
+# Nicolai says this MUST go at the top
+# Catch-alls
+metapkg.org			IGNORE
+
+# People
+#	Landon Fuller
+landonf@metapkg.org	landonf
+
+#	Bejamin Reed
+ranger@metapkg.org	ranger@befunk.com
+
+#	David Morrison
+drm@metapkg.org		drm@math.duke.edu
+
+#	Max Horn
+max@metapkg.org		max@quendi.de
+
+#	Daniel Robbins
+drobbins@metapkg.org	drobbins@gentoo.org
+
+#	Nick Jones
+carpaski@metapkg.org	carpaski@gentoo.org
+
+#	Pieter Van den Abeele
+pvdabeel@metapkg.org	pvdabeel@gentoo.org
+
+#	Kevin Van Vechten
+kevin@metapkg.org		kevin
+
+# Aliases
+pr@metapkg.org		core@metapkg.org
+
+# Mailing lists
+metapkg-core@metapkg.org	core@metapkg.org
+metapkg-core-admin@metapkg.org	metapkg-core-admin
+metapkg-core-request@metapkg.org	metapkg-core-request
+core@metapkg.org		metapkg-core
+
+# Mailing lists
+metapkg@metapkg.org		metapkg
+metapkg-admin@metapkg.org	metapkg-admin
+metapkg-request@metapkg.org	metapkg-request
+

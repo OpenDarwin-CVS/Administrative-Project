@@ -1,0 +1,776 @@
+#
+# Sample aliases file. Install in the location as specified by the
+# output from the command "postconf alias_maps". Typical path names
+# are /etc/aliases or /etc/mail/aliases.
+#
+#	>>>>>>>>>>      The program "newaliases" must be run after
+#	>> NOTE >>      this file is updated for any changes to
+#	>>>>>>>>>>      show through to Postfix.
+#
+
+# Person who should get root's mail. Don't receive mail as root!
+#root:		you
+
+# Basic system aliases -- these MUST be present
+MAILER-DAEMON:	postmaster
+postmaster:	root
+
+# General redirections for pseudo accounts
+bin:		root
+daemon:		root
+named:		root
+nobody:		root
+uucp:		root
+www:		root
+ftp-bugs:	root
+postfix:	root
+
+# Put your local aliases here.
+
+# Well-known aliases
+manager:	root
+dumper:		root
+operator:	root
+abuse:		postmaster
+
+# trap decode to catch security attacks
+decode:		root
+
+# ALIASES(5)                                             ALIASES(5)
+# 
+# NAME
+#        aliases - format of the Postfix alias database
+# 
+# SYNOPSIS
+#        newaliases
+# 
+# DESCRIPTION
+#        The  aliases  table  provides  a  system-wide mechanism to
+#        redirect mail for local recipients. The  redirections  are
+#        processed by the Postfix local(8) delivery agent.
+# 
+#        Normally,  the  aliases  table is specified as a text file
+#        that serves as input  to  the  postalias(1)  command.  The
+#        result,  an  indexed file in dbm or db format, is used for
+#        fast lookup  by  the  mail  system.  Execute  the  command
+#        newaliases  in  order  to  rebuild  the indexed file after
+#        changing the Postfix alias database.
+# 
+#        The input and output file formats are expected to be  com-
+#        patible  with  Sendmail  version 8, and are expected to be
+#        suitable for the use as NIS maps.
+# 
+#        Users can control delivery of their own mail by setting up
+#        .forward files in their home directory.  Lines in per-user
+#        .forward files have the same syntax as the right-hand side
+#        of aliases entries.
+# 
+#        The format of the alias database input file is as follows:
+# 
+#        o      An alias definition has the form
+# 
+#                    name: value1, value2, ...
+# 
+#        o      Empty lines and whitespace-only lines are  ignored,
+#               as  are  lines whose first non-whitespace character
+#               is a `#'.
+# 
+#        o      A logical line starts with non-whitespace  text.  A
+#               line  that starts with whitespace continues a logi-
+#               cal line.
+# 
+#        The name is a local address (no domain part).  Use  double
+#        quotes  when the name contains any special characters such
+#        as whitespace, `#', `:', or `@'. The  name  is  folded  to
+#        lowercase, in order to make database lookups case insensi-
+#        tive.
+# 
+#        In addition, when an alias exists for owner-name, delivery
+#        diagnostics  are  directed  to that address, instead of to
+#        the originator.  This is typically used to direct delivery
+#        errors  to the owner of a mailing list, who is in a better
+#        position to deal with mailing list delivery problems  than
+#        the originator of the undelivered mail.
+# 
+#        The value contains one or more of the following:
+# 
+#        address
+#               Mail  is  forwarded to address, which is compatible
+#               with the RFC 822 standard.
+# 
+#        /file/name
+#               Mail is appended to /file/name.  See  local(8)  for
+#               details  of delivery to file.  Delivery is not lim-
+#               ited to regular files.  For example, to dispose  of
+#               unwanted mail, deflect it to /dev/null.
+# 
+#        |command
+#               Mail  is  piped into command. Commands that contain
+#               special characters, such as whitespace,  should  be
+#               enclosed  between  double  quotes. See local(8) for
+#               details of delivery to command.
+# 
+#               When the command fails, a limited amount of command
+#               output  is  mailed  back  to  the sender.  The file
+#               /usr/include/sysexits.h defines the  expected  exit
+#               status  codes. For example, use |"exit 67" to simu-
+#               late a "user  unknown"  error,  and  |"exit  0"  to
+#               implement an expensive black hole.
+# 
+#        :include:/file/name
+#               Mail  is  sent  to  the  destinations listed in the
+#               named file.  Lines in :include: files have the same
+#               syntax as the right-hand side of alias entries.
+# 
+#               A  destination  can  be  any  destination  that  is
+#               described in this manual page. However, delivery to
+#               "|command" and /file/name is disallowed by default.
+#               To  enable,  edit  the  allow_mail_to_commands  and
+#               allow_mail_to_files configuration parameters.
+# 
+# ADDRESS EXTENSION
+#        When alias database search fails, and the recipient local-
+#        part contains  the  optional  recipient  delimiter  (e.g.,
+#        user+foo),  the  search  is  repeated  for  the unextended
+#        address (e.g., user).
+# 
+# CONFIGURATION PARAMETERS
+#        The following main.cf parameters are  especially  relevant
+#        to  this  topic.  See  the Postfix main.cf file for syntax
+#        details and for default values.  Use  the  postfix  reload
+#        command after a configuration change.
+# 
+#        alias_maps
+#               List of alias databases.
+# 
+#        allow_mail_to_commands
+#               Restrict  the  usage  of  mail delivery to external
+#               command.
+# 
+#        allow_mail_to_files
+#               Restrict the usage of  mail  delivery  to  external
+#               file.
+# 
+#        expand_owner_alias
+#               When delivering to an alias that has an owner- com-
+#               panion alias, set the envelope  sender  address  to
+#               the  right-hand  side  of  the owner alias, instead
+#               using of the left-hand side address.
+# 
+#        owner_request_special
+#               Give special treatment to owner-xxx and xxx-request
+#               addresses.
+# 
+#        recipient_delimiter
+#               Delimiter  that  separates  recipients from address
+#               extensions.
+# 
+# BUGS
+#        Regular expression alias lookup tables  are  allowed,  but
+#        substitution  of  $1  etc. is forbidden because that would
+#        open a security loophole.
+# 
+# STANDARDS
+#        RFC 822 (ARPA Internet Text Messages)
+# 
+# SEE ALSO
+#        local(8) local delivery agent
+#        newaliases(1) alias database management
+#        regexp_table(5) POSIX regular expression table format
+#        pcre_table(5) Perl Compatible Regular Expression table format
+# 
+# LICENSE
+#        The Secure Mailer license must be  distributed  with  this
+#        software.
+# 
+# AUTHOR(S)
+#        Wietse Venema
+#        IBM T.J. Watson Research
+#        P.O. Box 704
+#        Yorktown Heights, NY 10598, USA
+# 
+#                                                        ALIASES(5)
+
+
+mailman: bbraun
+mailman-owner: mailman
+root: bbraun
+lists: core
+release-mgr: ssen
+security: fkr, core
+
+approval:		"|/usr/local/bin/od_mailman 1"
+finkpopcon: "|/usr/local/bin/popcon.sh"
+
+announce: "|/Users/mailman/mail/mailman post announce"
+announce-admin: "|/Users/mailman/mail/mailman admin announce"
+announce-bounces: "|/Users/mailman/mail/mailman bounces announce"
+announce-confirm: "|/Users/mailman/mail/mailman confirm announce"
+announce-join: "|/Users/mailman/mail/mailman join announce"
+announce-leave: "|/Users/mailman/mail/mailman leave announce"
+announce-owner: "|/Users/mailman/mail/mailman owner announce"
+announce-request: "|/Users/mailman/mail/mailman request announce"
+announce-subscribe: "|/Users/mailman/mail/mailman subscribe announce"
+announce-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe announce"
+
+core: "|/Users/mailman/mail/mailman post core"
+core-admin: "|/Users/mailman/mail/mailman admin core"
+core-bounces: "|/Users/mailman/mail/mailman bounces core"
+core-confirm: "|/Users/mailman/mail/mailman confirm core"
+core-join: "|/Users/mailman/mail/mailman join core"
+core-leave: "|/Users/mailman/mail/mailman leave core"
+core-owner: "|/Users/mailman/mail/mailman owner core"
+core-request: "|/Users/mailman/mail/mailman request core"
+core-subscribe: "|/Users/mailman/mail/mailman subscribe core"
+core-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe core"
+
+hackers: "|/Users/mailman/mail/mailman post hackers"
+hackers-admin: "|/Users/mailman/mail/mailman admin hackers"
+hackers-bounces: "|/Users/mailman/mail/mailman bounces hackers"
+hackers-confirm: "|/Users/mailman/mail/mailman confirm hackers"
+hackers-join: "|/Users/mailman/mail/mailman join hackers"
+hackers-leave: "|/Users/mailman/mail/mailman leave hackers"
+hackers-owner: "|/Users/mailman/mail/mailman owner hackers"
+hackers-request: "|/Users/mailman/mail/mailman request hackers"
+hackers-subscribe: "|/Users/mailman/mail/mailman subscribe hackers"
+hackers-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe hackers"
+
+discuss: "|/Users/mailman/mail/mailman post discuss"
+discuss-admin: "|/Users/mailman/mail/mailman admin discuss"
+discuss-bounces: "|/Users/mailman/mail/mailman bounces discuss"
+discuss-confirm: "|/Users/mailman/mail/mailman confirm discuss"
+discuss-join: "|/Users/mailman/mail/mailman join discuss"
+discuss-leave: "|/Users/mailman/mail/mailman leave discuss"
+discuss-owner: "|/Users/mailman/mail/mailman owner discuss"
+discuss-request: "|/Users/mailman/mail/mailman request discuss"
+discuss-subscribe: "|/Users/mailman/mail/mailman subscribe discuss"
+discuss-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe discuss"
+
+test: "|/Users/mailman/mail/mailman post test"
+test-admin: "|/Users/mailman/mail/mailman admin test"
+test-bounces: "|/Users/mailman/mail/mailman bounces test"
+test-confirm: "|/Users/mailman/mail/mailman confirm test"
+test-join: "|/Users/mailman/mail/mailman join test"
+test-leave: "|/Users/mailman/mail/mailman leave test"
+test-owner: "|/Users/mailman/mail/mailman owner test"
+test-request: "|/Users/mailman/mail/mailman request test"
+test-subscribe: "|/Users/mailman/mail/mailman subscribe test"
+test-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe test"
+
+cvs-log-all: "|/Users/mailman/mail/mailman post cvs-log-all"
+cvs-log-all-admin: "|/Users/mailman/mail/mailman admin cvs-log-all"
+cvs-log-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-log-all"
+cvs-log-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-log-all"
+cvs-log-all-join: "|/Users/mailman/mail/mailman join cvs-log-all"
+cvs-log-all-leave: "|/Users/mailman/mail/mailman leave cvs-log-all"
+cvs-log-all-owner: "|/Users/mailman/mail/mailman owner cvs-log-all"
+cvs-log-all-request: "|/Users/mailman/mail/mailman request cvs-log-all"
+cvs-log-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-log-all"
+cvs-log-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-log-all"
+
+cvs-www-all: "|/Users/mailman/mail/mailman post cvs-www-all"
+cvs-www-all-admin: "|/Users/mailman/mail/mailman admin cvs-www-all"
+cvs-www-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-www-all"
+cvs-www-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-www-all"
+cvs-www-all-join: "|/Users/mailman/mail/mailman join cvs-www-all"
+cvs-www-all-leave: "|/Users/mailman/mail/mailman leave cvs-www-all"
+cvs-www-all-owner: "|/Users/mailman/mail/mailman owner cvs-www-all"
+cvs-www-all-request: "|/Users/mailman/mail/mailman request cvs-www-all"
+cvs-www-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-www-all"
+cvs-www-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-www-all"
+
+cvs-src-all: "|/Users/mailman/mail/mailman post cvs-src-all"
+cvs-src-all-admin: "|/Users/mailman/mail/mailman admin cvs-src-all"
+cvs-src-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-src-all"
+cvs-src-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-src-all"
+cvs-src-all-join: "|/Users/mailman/mail/mailman join cvs-src-all"
+cvs-src-all-leave: "|/Users/mailman/mail/mailman leave cvs-src-all"
+cvs-src-all-owner: "|/Users/mailman/mail/mailman owner cvs-src-all"
+cvs-src-all-request: "|/Users/mailman/mail/mailman request cvs-src-all"
+cvs-src-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-src-all"
+cvs-src-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-src-all"
+
+cvs-doc-all: "|/Users/mailman/mail/mailman post cvs-doc-all"
+cvs-doc-all-admin: "|/Users/mailman/mail/mailman admin cvs-doc-all"
+cvs-doc-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-doc-all"
+cvs-doc-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-doc-all"
+cvs-doc-all-join: "|/Users/mailman/mail/mailman join cvs-doc-all"
+cvs-doc-all-leave: "|/Users/mailman/mail/mailman leave cvs-doc-all"
+cvs-doc-all-owner: "|/Users/mailman/mail/mailman owner cvs-doc-all"
+cvs-doc-all-request: "|/Users/mailman/mail/mailman request cvs-doc-all"
+cvs-doc-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-doc-all"
+cvs-doc-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-doc-all"
+
+cvs-administrative-project-all: "|/Users/mailman/mail/mailman post cvs-administrative-project-all"
+cvs-administrative-project-all-admin: "|/Users/mailman/mail/mailman admin cvs-administrative-project-all"
+cvs-administrative-project-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-administrative-project-all"
+cvs-administrative-project-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-administrative-project-all"
+cvs-administrative-project-all-join: "|/Users/mailman/mail/mailman join cvs-administrative-project-all"
+cvs-administrative-project-all-leave: "|/Users/mailman/mail/mailman leave cvs-administrative-project-all"
+cvs-administrative-project-all-owner: "|/Users/mailman/mail/mailman owner cvs-administrative-project-all"
+cvs-administrative-project-all-request: "|/Users/mailman/mail/mailman request cvs-administrative-project-all"
+cvs-administrative-project-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-administrative-project-all"
+cvs-administrative-project-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-administrative-project-all"
+
+cvs-iokitexamples-all: "|/Users/mailman/mail/mailman post cvs-iokitexamples-all"
+cvs-iokitexamples-all-admin: "|/Users/mailman/mail/mailman admin cvs-iokitexamples-all"
+cvs-iokitexamples-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-iokitexamples-all"
+cvs-iokitexamples-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-iokitexamples-all"
+cvs-iokitexamples-all-join: "|/Users/mailman/mail/mailman join cvs-iokitexamples-all"
+cvs-iokitexamples-all-leave: "|/Users/mailman/mail/mailman leave cvs-iokitexamples-all"
+cvs-iokitexamples-all-owner: "|/Users/mailman/mail/mailman owner cvs-iokitexamples-all"
+cvs-iokitexamples-all-request: "|/Users/mailman/mail/mailman request cvs-iokitexamples-all"
+cvs-iokitexamples-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-iokitexamples-all"
+cvs-iokitexamples-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-iokitexamples-all"
+
+cvs-japanese-documentation-all: "|/Users/mailman/mail/mailman post cvs-japanese-documentation-all"
+cvs-japanese-documentation-all-admin: "|/Users/mailman/mail/mailman admin cvs-japanese-documentation-all"
+cvs-japanese-documentation-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-japanese-documentation-all"
+cvs-japanese-documentation-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-japanese-documentation-all"
+cvs-japanese-documentation-all-join: "|/Users/mailman/mail/mailman join cvs-japanese-documentation-all"
+cvs-japanese-documentation-all-leave: "|/Users/mailman/mail/mailman leave cvs-japanese-documentation-all"
+cvs-japanese-documentation-all-owner: "|/Users/mailman/mail/mailman owner cvs-japanese-documentation-all"
+cvs-japanese-documentation-all-request: "|/Users/mailman/mail/mailman request cvs-japanese-documentation-all"
+cvs-japanese-documentation-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-japanese-documentation-all"
+cvs-japanese-documentation-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-japanese-documentation-all"
+
+kde-darwin: "|/Users/mailman/mail/mailman post kde-darwin"
+kde-darwin-admin: "|/Users/mailman/mail/mailman admin kde-darwin"
+kde-darwin-bounces: "|/Users/mailman/mail/mailman bounces kde-darwin"
+kde-darwin-confirm: "|/Users/mailman/mail/mailman confirm kde-darwin"
+kde-darwin-join: "|/Users/mailman/mail/mailman join kde-darwin"
+kde-darwin-leave: "|/Users/mailman/mail/mailman leave kde-darwin"
+kde-darwin-owner: "|/Users/mailman/mail/mailman owner kde-darwin"
+kde-darwin-request: "|/Users/mailman/mail/mailman request kde-darwin"
+kde-darwin-subscribe: "|/Users/mailman/mail/mailman subscribe kde-darwin"
+kde-darwin-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe kde-darwin"
+
+cvs-kde-darwin-all: "|/Users/mailman/mail/mailman post cvs-kde-darwin-all"
+cvs-kde-darwin-all-admin: "|/Users/mailman/mail/mailman admin cvs-kde-darwin-all"
+cvs-kde-darwin-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-kde-darwin-all"
+cvs-kde-darwin-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-kde-darwin-all"
+cvs-kde-darwin-all-join: "|/Users/mailman/mail/mailman join cvs-kde-darwin-all"
+cvs-kde-darwin-all-leave: "|/Users/mailman/mail/mailman leave cvs-kde-darwin-all"
+cvs-kde-darwin-all-owner: "|/Users/mailman/mail/mailman owner cvs-kde-darwin-all"
+cvs-kde-darwin-all-request: "|/Users/mailman/mail/mailman request cvs-kde-darwin-all"
+cvs-kde-darwin-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-kde-darwin-all"
+cvs-kde-darwin-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-kde-darwin-all"
+
+cvs-openplay-all: "|/Users/mailman/mail/mailman post cvs-openplay-all"
+cvs-openplay-all-admin: "|/Users/mailman/mail/mailman admin cvs-openplay-all"
+cvs-openplay-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-openplay-all"
+cvs-openplay-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-openplay-all"
+cvs-openplay-all-join: "|/Users/mailman/mail/mailman join cvs-openplay-all"
+cvs-openplay-all-leave: "|/Users/mailman/mail/mailman leave cvs-openplay-all"
+cvs-openplay-all-owner: "|/Users/mailman/mail/mailman owner cvs-openplay-all"
+cvs-openplay-all-request: "|/Users/mailman/mail/mailman request cvs-openplay-all"
+cvs-openplay-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-openplay-all"
+cvs-openplay-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-openplay-all"
+
+cvs-xpostfacto-all: "|/Users/mailman/mail/mailman post cvs-xpostfacto-all"
+cvs-xpostfacto-all-admin: "|/Users/mailman/mail/mailman admin cvs-xpostfacto-all"
+cvs-xpostfacto-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-xpostfacto-all"
+cvs-xpostfacto-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-xpostfacto-all"
+cvs-xpostfacto-all-join: "|/Users/mailman/mail/mailman join cvs-xpostfacto-all"
+cvs-xpostfacto-all-leave: "|/Users/mailman/mail/mailman leave cvs-xpostfacto-all"
+cvs-xpostfacto-all-owner: "|/Users/mailman/mail/mailman owner cvs-xpostfacto-all"
+cvs-xpostfacto-all-request: "|/Users/mailman/mail/mailman request cvs-xpostfacto-all"
+cvs-xpostfacto-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-xpostfacto-all"
+cvs-xpostfacto-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-xpostfacto-all"
+
+rsync_hfs: "|/Users/mailman/mail/mailman post rsync_hfs"
+rsync_hfs-admin: "|/Users/mailman/mail/mailman admin rsync_hfs"
+rsync_hfs-bounces: "|/Users/mailman/mail/mailman bounces rsync_hfs"
+rsync_hfs-confirm: "|/Users/mailman/mail/mailman confirm rsync_hfs"
+rsync_hfs-join: "|/Users/mailman/mail/mailman join rsync_hfs"
+rsync_hfs-leave: "|/Users/mailman/mail/mailman leave rsync_hfs"
+rsync_hfs-owner: "|/Users/mailman/mail/mailman owner rsync_hfs"
+rsync_hfs-request: "|/Users/mailman/mail/mailman request rsync_hfs"
+rsync_hfs-subscribe: "|/Users/mailman/mail/mailman subscribe rsync_hfs"
+rsync_hfs-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe rsync_hfs"
+
+darwinports: "|/Users/mailman/mail/mailman post darwinports"
+darwinports-admin: "|/Users/mailman/mail/mailman admin darwinports"
+darwinports-bounces: "|/Users/mailman/mail/mailman bounces darwinports"
+darwinports-confirm: "|/Users/mailman/mail/mailman confirm darwinports"
+darwinports-join: "|/Users/mailman/mail/mailman join darwinports"
+darwinports-leave: "|/Users/mailman/mail/mailman leave darwinports"
+darwinports-owner: "|/Users/mailman/mail/mailman owner darwinports"
+darwinports-request: "|/Users/mailman/mail/mailman request darwinports"
+darwinports-subscribe: "|/Users/mailman/mail/mailman subscribe darwinports"
+darwinports-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe darwinports"
+
+cvs-darwinports-all: "|/Users/mailman/mail/mailman post cvs-darwinports-all"
+cvs-darwinports-all-admin: "|/Users/mailman/mail/mailman admin cvs-darwinports-all"
+cvs-darwinports-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-darwinports-all"
+cvs-darwinports-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-darwinports-all"
+cvs-darwinports-all-join: "|/Users/mailman/mail/mailman join cvs-darwinports-all"
+cvs-darwinports-all-leave: "|/Users/mailman/mail/mailman leave cvs-darwinports-all"
+cvs-darwinports-all-owner: "|/Users/mailman/mail/mailman owner cvs-darwinports-all"
+cvs-darwinports-all-request: "|/Users/mailman/mail/mailman request cvs-darwinports-all"
+cvs-darwinports-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-darwinports-all"
+cvs-darwinports-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-darwinports-all"
+
+cvs-darwinports: "|/Users/mailman/mail/mailman post cvs-darwinports"
+cvs-darwinports-admin: "|/Users/mailman/mail/mailman admin cvs-darwinports"
+cvs-darwinports-bounces: "|/Users/mailman/mail/mailman bounces cvs-darwinports"
+cvs-darwinports-confirm: "|/Users/mailman/mail/mailman confirm cvs-darwinports"
+cvs-darwinports-join: "|/Users/mailman/mail/mailman join cvs-darwinports"
+cvs-darwinports-leave: "|/Users/mailman/mail/mailman leave cvs-darwinports"
+cvs-darwinports-owner: "|/Users/mailman/mail/mailman owner cvs-darwinports"
+cvs-darwinports-request: "|/Users/mailman/mail/mailman request cvs-darwinports"
+cvs-darwinports-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-darwinports"
+cvs-darwinports-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-darwinports"
+
+cvs-dlcompat-all: "|/Users/mailman/mail/mailman post cvs-dlcompat-all"
+cvs-dlcompat-all-admin: "|/Users/mailman/mail/mailman admin cvs-dlcompat-all"
+cvs-dlcompat-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-dlcompat-all"
+cvs-dlcompat-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-dlcompat-all"
+cvs-dlcompat-all-join: "|/Users/mailman/mail/mailman join cvs-dlcompat-all"
+cvs-dlcompat-all-leave: "|/Users/mailman/mail/mailman leave cvs-dlcompat-all"
+cvs-dlcompat-all-owner: "|/Users/mailman/mail/mailman owner cvs-dlcompat-all"
+cvs-dlcompat-all-request: "|/Users/mailman/mail/mailman request cvs-dlcompat-all"
+cvs-dlcompat-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-dlcompat-all"
+cvs-dlcompat-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-dlcompat-all"
+
+cvs-rsync_hfs-all: "|/Users/mailman/mail/mailman post cvs-rsync_hfs-all"
+cvs-rsync_hfs-all-admin: "|/Users/mailman/mail/mailman admin cvs-rsync_hfs-all"
+cvs-rsync_hfs-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-rsync_hfs-all"
+cvs-rsync_hfs-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-rsync_hfs-all"
+cvs-rsync_hfs-all-join: "|/Users/mailman/mail/mailman join cvs-rsync_hfs-all"
+cvs-rsync_hfs-all-leave: "|/Users/mailman/mail/mailman leave cvs-rsync_hfs-all"
+cvs-rsync_hfs-all-owner: "|/Users/mailman/mail/mailman owner cvs-rsync_hfs-all"
+cvs-rsync_hfs-all-request: "|/Users/mailman/mail/mailman request cvs-rsync_hfs-all"
+cvs-rsync_hfs-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-rsync_hfs-all"
+cvs-rsync_hfs-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-rsync_hfs-all"
+
+cvs-cdsa-integration-all: "|/Users/mailman/mail/mailman post cvs-cdsa-integration-all"
+cvs-cdsa-integration-all-admin: "|/Users/mailman/mail/mailman admin cvs-cdsa-integration-all"
+cvs-cdsa-integration-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-cdsa-integration-all"
+cvs-cdsa-integration-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-cdsa-integration-all"
+cvs-cdsa-integration-all-join: "|/Users/mailman/mail/mailman join cvs-cdsa-integration-all"
+cvs-cdsa-integration-all-leave: "|/Users/mailman/mail/mailman leave cvs-cdsa-integration-all"
+cvs-cdsa-integration-all-owner: "|/Users/mailman/mail/mailman owner cvs-cdsa-integration-all"
+cvs-cdsa-integration-all-request: "|/Users/mailman/mail/mailman request cvs-cdsa-integration-all"
+cvs-cdsa-integration-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-cdsa-integration-all"
+cvs-cdsa-integration-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-cdsa-integration-all"
+
+dp-cocoa: "|/Users/mailman/mail/mailman post dp-cocoa"
+dp-cocoa-admin: "|/Users/mailman/mail/mailman admin dp-cocoa"
+dp-cocoa-bounces: "|/Users/mailman/mail/mailman bounces dp-cocoa"
+dp-cocoa-confirm: "|/Users/mailman/mail/mailman confirm dp-cocoa"
+dp-cocoa-join: "|/Users/mailman/mail/mailman join dp-cocoa"
+dp-cocoa-leave: "|/Users/mailman/mail/mailman leave dp-cocoa"
+dp-cocoa-owner: "|/Users/mailman/mail/mailman owner dp-cocoa"
+dp-cocoa-request: "|/Users/mailman/mail/mailman request dp-cocoa"
+dp-cocoa-subscribe: "|/Users/mailman/mail/mailman subscribe dp-cocoa"
+dp-cocoa-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe dp-cocoa"
+
+cvs-dp-cocoa-all: "|/Users/mailman/mail/mailman post cvs-dp-cocoa-all"
+cvs-dp-cocoa-all-admin: "|/Users/mailman/mail/mailman admin cvs-dp-cocoa-all"
+cvs-dp-cocoa-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-dp-cocoa-all"
+cvs-dp-cocoa-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-dp-cocoa-all"
+cvs-dp-cocoa-all-join: "|/Users/mailman/mail/mailman join cvs-dp-cocoa-all"
+cvs-dp-cocoa-all-leave: "|/Users/mailman/mail/mailman leave cvs-dp-cocoa-all"
+cvs-dp-cocoa-all-owner: "|/Users/mailman/mail/mailman owner cvs-dp-cocoa-all"
+cvs-dp-cocoa-all-request: "|/Users/mailman/mail/mailman request cvs-dp-cocoa-all"
+cvs-dp-cocoa-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-dp-cocoa-all"
+cvs-dp-cocoa-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-dp-cocoa-all"
+
+portmgr: "|/Users/mailman/mail/mailman post portmgr"
+portmgr-admin: "|/Users/mailman/mail/mailman admin portmgr"
+portmgr-bounces: "|/Users/mailman/mail/mailman bounces portmgr"
+portmgr-confirm: "|/Users/mailman/mail/mailman confirm portmgr"
+portmgr-join: "|/Users/mailman/mail/mailman join portmgr"
+portmgr-leave: "|/Users/mailman/mail/mailman leave portmgr"
+portmgr-owner: "|/Users/mailman/mail/mailman owner portmgr"
+portmgr-request: "|/Users/mailman/mail/mailman request portmgr"
+portmgr-subscribe: "|/Users/mailman/mail/mailman subscribe portmgr"
+portmgr-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe portmgr"
+
+dp-feedback: "|/Users/mailman/mail/mailman post dp-feedback"
+dp-feedback-admin: "|/Users/mailman/mail/mailman admin dp-feedback"
+dp-feedback-bounces: "|/Users/mailman/mail/mailman bounces dp-feedback"
+dp-feedback-confirm: "|/Users/mailman/mail/mailman confirm dp-feedback"
+dp-feedback-join: "|/Users/mailman/mail/mailman join dp-feedback"
+dp-feedback-leave: "|/Users/mailman/mail/mailman leave dp-feedback"
+dp-feedback-owner: "|/Users/mailman/mail/mailman owner dp-feedback"
+dp-feedback-request: "|/Users/mailman/mail/mailman request dp-feedback"
+dp-feedback-subscribe: "|/Users/mailman/mail/mailman subscribe dp-feedback"
+dp-feedback-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe dp-feedback"
+
+biome: "|/Users/mailman/mail/mailman post biome"
+biome-admin: "|/Users/mailman/mail/mailman admin biome"
+biome-bounces: "|/Users/mailman/mail/mailman bounces biome"
+biome-confirm: "|/Users/mailman/mail/mailman confirm biome"
+biome-join: "|/Users/mailman/mail/mailman join biome"
+biome-leave: "|/Users/mailman/mail/mailman leave biome"
+biome-owner: "|/Users/mailman/mail/mailman owner biome"
+biome-request: "|/Users/mailman/mail/mailman request biome"
+biome-subscribe: "|/Users/mailman/mail/mailman subscribe biome"
+biome-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe biome"
+
+cvs-biome-all: "|/Users/mailman/mail/mailman post cvs-biome-all"
+cvs-biome-all-admin: "|/Users/mailman/mail/mailman admin cvs-biome-all"
+cvs-biome-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-biome-all"
+cvs-biome-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-biome-all"
+cvs-biome-all-join: "|/Users/mailman/mail/mailman join cvs-biome-all"
+cvs-biome-all-leave: "|/Users/mailman/mail/mailman leave cvs-biome-all"
+cvs-biome-all-owner: "|/Users/mailman/mail/mailman owner cvs-biome-all"
+cvs-biome-all-request: "|/Users/mailman/mail/mailman request cvs-biome-all"
+cvs-biome-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-biome-all"
+cvs-biome-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-biome-all"
+
+keynote-tools: "|/Users/mailman/mail/mailman post keynote-tools"
+keynote-tools-admin: "|/Users/mailman/mail/mailman admin keynote-tools"
+keynote-tools-bounces: "|/Users/mailman/mail/mailman bounces keynote-tools"
+keynote-tools-confirm: "|/Users/mailman/mail/mailman confirm keynote-tools"
+keynote-tools-join: "|/Users/mailman/mail/mailman join keynote-tools"
+keynote-tools-leave: "|/Users/mailman/mail/mailman leave keynote-tools"
+keynote-tools-owner: "|/Users/mailman/mail/mailman owner keynote-tools"
+keynote-tools-request: "|/Users/mailman/mail/mailman request keynote-tools"
+keynote-tools-subscribe: "|/Users/mailman/mail/mailman subscribe keynote-tools"
+keynote-tools-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe keynote-tools"
+
+cvs-keynote-tools-all: "|/Users/mailman/mail/mailman post cvs-keynote-tools-all"
+cvs-keynote-tools-all-admin: "|/Users/mailman/mail/mailman admin cvs-keynote-tools-all"
+cvs-keynote-tools-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-keynote-tools-all"
+cvs-keynote-tools-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-keynote-tools-all"
+cvs-keynote-tools-all-join: "|/Users/mailman/mail/mailman join cvs-keynote-tools-all"
+cvs-keynote-tools-all-leave: "|/Users/mailman/mail/mailman leave cvs-keynote-tools-all"
+cvs-keynote-tools-all-owner: "|/Users/mailman/mail/mailman owner cvs-keynote-tools-all"
+cvs-keynote-tools-all-request: "|/Users/mailman/mail/mailman request cvs-keynote-tools-all"
+cvs-keynote-tools-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-keynote-tools-all"
+cvs-keynote-tools-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-keynote-tools-all"
+
+darwinports-bugs: "|/Users/mailman/mail/mailman post darwinports-bugs"
+darwinports-bugs-admin: "|/Users/mailman/mail/mailman admin darwinports-bugs"
+darwinports-bugs-bounces: "|/Users/mailman/mail/mailman bounces darwinports-bugs"
+darwinports-bugs-confirm: "|/Users/mailman/mail/mailman confirm darwinports-bugs"
+darwinports-bugs-join: "|/Users/mailman/mail/mailman join darwinports-bugs"
+darwinports-bugs-leave: "|/Users/mailman/mail/mailman leave darwinports-bugs"
+darwinports-bugs-owner: "|/Users/mailman/mail/mailman owner darwinports-bugs"
+darwinports-bugs-request: "|/Users/mailman/mail/mailman request darwinports-bugs"
+darwinports-bugs-subscribe: "|/Users/mailman/mail/mailman subscribe darwinports-bugs"
+darwinports-bugs-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe darwinports-bugs"
+
+portsmanager: "|/Users/mailman/mail/mailman post portsmanager"
+portsmanager-admin: "|/Users/mailman/mail/mailman admin portsmanager"
+portsmanager-bounces: "|/Users/mailman/mail/mailman bounces portsmanager"
+portsmanager-confirm: "|/Users/mailman/mail/mailman confirm portsmanager"
+portsmanager-join: "|/Users/mailman/mail/mailman join portsmanager"
+portsmanager-leave: "|/Users/mailman/mail/mailman leave portsmanager"
+portsmanager-owner: "|/Users/mailman/mail/mailman owner portsmanager"
+portsmanager-request: "|/Users/mailman/mail/mailman request portsmanager"
+portsmanager-subscribe: "|/Users/mailman/mail/mailman subscribe portsmanager"
+portsmanager-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe portsmanager"
+
+cvs-portsmanager-all: "|/Users/mailman/mail/mailman post cvs-portsmanager-all"
+cvs-portsmanager-all-admin: "|/Users/mailman/mail/mailman admin cvs-portsmanager-all"
+cvs-portsmanager-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-portsmanager-all"
+cvs-portsmanager-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-portsmanager-all"
+cvs-portsmanager-all-join: "|/Users/mailman/mail/mailman join cvs-portsmanager-all"
+cvs-portsmanager-all-leave: "|/Users/mailman/mail/mailman leave cvs-portsmanager-all"
+cvs-portsmanager-all-owner: "|/Users/mailman/mail/mailman owner cvs-portsmanager-all"
+cvs-portsmanager-all-request: "|/Users/mailman/mail/mailman request cvs-portsmanager-all"
+cvs-portsmanager-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-portsmanager-all"
+cvs-portsmanager-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-portsmanager-all"
+
+networkaudiodevice: "|/Users/mailman/mail/mailman post networkaudiodevice"
+networkaudiodevice-admin: "|/Users/mailman/mail/mailman admin networkaudiodevice"
+networkaudiodevice-bounces: "|/Users/mailman/mail/mailman bounces networkaudiodevice"
+networkaudiodevice-confirm: "|/Users/mailman/mail/mailman confirm networkaudiodevice"
+networkaudiodevice-join: "|/Users/mailman/mail/mailman join networkaudiodevice"
+networkaudiodevice-leave: "|/Users/mailman/mail/mailman leave networkaudiodevice"
+networkaudiodevice-owner: "|/Users/mailman/mail/mailman owner networkaudiodevice"
+networkaudiodevice-request: "|/Users/mailman/mail/mailman request networkaudiodevice"
+networkaudiodevice-subscribe: "|/Users/mailman/mail/mailman subscribe networkaudiodevice"
+networkaudiodevice-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe networkaudiodevice"
+
+cvs-networkaudiodevice-all: "|/Users/mailman/mail/mailman post cvs-networkaudiodevice-all"
+cvs-networkaudiodevice-all-admin: "|/Users/mailman/mail/mailman admin cvs-networkaudiodevice-all"
+cvs-networkaudiodevice-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-networkaudiodevice-all"
+cvs-networkaudiodevice-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-networkaudiodevice-all"
+cvs-networkaudiodevice-all-join: "|/Users/mailman/mail/mailman join cvs-networkaudiodevice-all"
+cvs-networkaudiodevice-all-leave: "|/Users/mailman/mail/mailman leave cvs-networkaudiodevice-all"
+cvs-networkaudiodevice-all-owner: "|/Users/mailman/mail/mailman owner cvs-networkaudiodevice-all"
+cvs-networkaudiodevice-all-request: "|/Users/mailman/mail/mailman request cvs-networkaudiodevice-all"
+cvs-networkaudiodevice-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-networkaudiodevice-all"
+cvs-networkaudiodevice-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-networkaudiodevice-all"
+
+osx2x: "|/Users/mailman/mail/mailman post osx2x"
+osx2x-admin: "|/Users/mailman/mail/mailman admin osx2x"
+osx2x-bounces: "|/Users/mailman/mail/mailman bounces osx2x"
+osx2x-confirm: "|/Users/mailman/mail/mailman confirm osx2x"
+osx2x-join: "|/Users/mailman/mail/mailman join osx2x"
+osx2x-leave: "|/Users/mailman/mail/mailman leave osx2x"
+osx2x-owner: "|/Users/mailman/mail/mailman owner osx2x"
+osx2x-request: "|/Users/mailman/mail/mailman request osx2x"
+osx2x-subscribe: "|/Users/mailman/mail/mailman subscribe osx2x"
+osx2x-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe osx2x"
+
+cvs-osx2x-all: "|/Users/mailman/mail/mailman post cvs-osx2x-all"
+cvs-osx2x-all-admin: "|/Users/mailman/mail/mailman admin cvs-osx2x-all"
+cvs-osx2x-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-osx2x-all"
+cvs-osx2x-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-osx2x-all"
+cvs-osx2x-all-join: "|/Users/mailman/mail/mailman join cvs-osx2x-all"
+cvs-osx2x-all-leave: "|/Users/mailman/mail/mailman leave cvs-osx2x-all"
+cvs-osx2x-all-owner: "|/Users/mailman/mail/mailman owner cvs-osx2x-all"
+cvs-osx2x-all-request: "|/Users/mailman/mail/mailman request cvs-osx2x-all"
+cvs-osx2x-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-osx2x-all"
+cvs-osx2x-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-osx2x-all"
+
+doc: "|/Users/mailman/mail/mailman post doc"
+doc-admin: "|/Users/mailman/mail/mailman admin doc"
+doc-bounces: "|/Users/mailman/mail/mailman bounces doc"
+doc-confirm: "|/Users/mailman/mail/mailman confirm doc"
+doc-join: "|/Users/mailman/mail/mailman join doc"
+doc-leave: "|/Users/mailman/mail/mailman leave doc"
+doc-owner: "|/Users/mailman/mail/mailman owner doc"
+doc-request: "|/Users/mailman/mail/mailman request doc"
+doc-subscribe: "|/Users/mailman/mail/mailman subscribe doc"
+doc-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe doc"
+
+security-announce: "|/Users/mailman/mail/mailman post security-announce"
+security-announce-admin: "|/Users/mailman/mail/mailman admin security-announce"
+security-announce-bounces: "|/Users/mailman/mail/mailman bounces security-announce"
+security-announce-confirm: "|/Users/mailman/mail/mailman confirm security-announce"
+security-announce-join: "|/Users/mailman/mail/mailman join security-announce"
+security-announce-leave: "|/Users/mailman/mail/mailman leave security-announce"
+security-announce-owner: "|/Users/mailman/mail/mailman owner security-announce"
+security-announce-request: "|/Users/mailman/mail/mailman request security-announce"
+security-announce-subscribe: "|/Users/mailman/mail/mailman subscribe security-announce"
+security-announce-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe security-announce"
+
+darwinporting-core: "|/Users/mailman/mail/mailman post darwinporting-core"
+darwinporting-core-admin: "|/Users/mailman/mail/mailman admin darwinporting-core"
+darwinporting-core-bounces: "|/Users/mailman/mail/mailman bounces darwinporting-core"
+darwinporting-core-confirm: "|/Users/mailman/mail/mailman confirm darwinporting-core"
+darwinporting-core-join: "|/Users/mailman/mail/mailman join darwinporting-core"
+darwinporting-core-leave: "|/Users/mailman/mail/mailman leave darwinporting-core"
+darwinporting-core-owner: "|/Users/mailman/mail/mailman owner darwinporting-core"
+darwinporting-core-request: "|/Users/mailman/mail/mailman request darwinporting-core"
+darwinporting-core-subscribe: "|/Users/mailman/mail/mailman subscribe darwinporting-core"
+darwinporting-core-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe darwinporting-core"
+
+metapkg: "|/Users/mailman/mail/mailman post metapkg"
+metapkg-admin: "|/Users/mailman/mail/mailman admin metapkg"
+metapkg-bounces: "|/Users/mailman/mail/mailman bounces metapkg"
+metapkg-confirm: "|/Users/mailman/mail/mailman confirm metapkg"
+metapkg-join: "|/Users/mailman/mail/mailman join metapkg"
+metapkg-leave: "|/Users/mailman/mail/mailman leave metapkg"
+metapkg-owner: "|/Users/mailman/mail/mailman owner metapkg"
+metapkg-request: "|/Users/mailman/mail/mailman request metapkg"
+metapkg-subscribe: "|/Users/mailman/mail/mailman subscribe metapkg"
+metapkg-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe metapkg"
+
+cvs-metapkg-all: "|/Users/mailman/mail/mailman post cvs-metapkg-all"
+cvs-metapkg-all-admin: "|/Users/mailman/mail/mailman admin cvs-metapkg-all"
+cvs-metapkg-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-metapkg-all"
+cvs-metapkg-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-metapkg-all"
+cvs-metapkg-all-join: "|/Users/mailman/mail/mailman join cvs-metapkg-all"
+cvs-metapkg-all-leave: "|/Users/mailman/mail/mailman leave cvs-metapkg-all"
+cvs-metapkg-all-owner: "|/Users/mailman/mail/mailman owner cvs-metapkg-all"
+cvs-metapkg-all-request: "|/Users/mailman/mail/mailman request cvs-metapkg-all"
+cvs-metapkg-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-metapkg-all"
+cvs-metapkg-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-metapkg-all"
+
+metapkg-core: "|/Users/mailman/mail/mailman post metapkg-core"
+metapkg-core-admin: "|/Users/mailman/mail/mailman admin metapkg-core"
+metapkg-core-bounces: "|/Users/mailman/mail/mailman bounces metapkg-core"
+metapkg-core-confirm: "|/Users/mailman/mail/mailman confirm metapkg-core"
+metapkg-core-join: "|/Users/mailman/mail/mailman join metapkg-core"
+metapkg-core-leave: "|/Users/mailman/mail/mailman leave metapkg-core"
+metapkg-core-owner: "|/Users/mailman/mail/mailman owner metapkg-core"
+metapkg-core-request: "|/Users/mailman/mail/mailman request metapkg-core"
+metapkg-core-subscribe: "|/Users/mailman/mail/mailman subscribe metapkg-core"
+metapkg-core-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe metapkg-core"
+
+darwin-bugs: "|/Users/mailman/mail/mailman post darwin-bugs"
+darwin-bugs-admin: "|/Users/mailman/mail/mailman admin darwin-bugs"
+darwin-bugs-bounces: "|/Users/mailman/mail/mailman bounces darwin-bugs"
+darwin-bugs-confirm: "|/Users/mailman/mail/mailman confirm darwin-bugs"
+darwin-bugs-join: "|/Users/mailman/mail/mailman join darwin-bugs"
+darwin-bugs-leave: "|/Users/mailman/mail/mailman leave darwin-bugs"
+darwin-bugs-owner: "|/Users/mailman/mail/mailman owner darwin-bugs"
+darwin-bugs-request: "|/Users/mailman/mail/mailman request darwin-bugs"
+darwin-bugs-subscribe: "|/Users/mailman/mail/mailman subscribe darwin-bugs"
+darwin-bugs-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe darwin-bugs"
+
+adduser: "|/Users/mailman/mail/mailman post adduser"
+adduser-admin: "|/Users/mailman/mail/mailman admin adduser"
+adduser-bounces: "|/Users/mailman/mail/mailman bounces adduser"
+adduser-confirm: "|/Users/mailman/mail/mailman confirm adduser"
+adduser-join: "|/Users/mailman/mail/mailman join adduser"
+adduser-leave: "|/Users/mailman/mail/mailman leave adduser"
+adduser-owner: "|/Users/mailman/mail/mailman owner adduser"
+adduser-request: "|/Users/mailman/mail/mailman request adduser"
+adduser-subscribe: "|/Users/mailman/mail/mailman subscribe adduser"
+adduser-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe adduser"
+
+cvs-adduser-all: "|/Users/mailman/mail/mailman post cvs-adduser-all"
+cvs-adduser-all-admin: "|/Users/mailman/mail/mailman admin cvs-adduser-all"
+cvs-adduser-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-adduser-all"
+cvs-adduser-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-adduser-all"
+cvs-adduser-all-join: "|/Users/mailman/mail/mailman join cvs-adduser-all"
+cvs-adduser-all-leave: "|/Users/mailman/mail/mailman leave cvs-adduser-all"
+cvs-adduser-all-owner: "|/Users/mailman/mail/mailman owner cvs-adduser-all"
+cvs-adduser-all-request: "|/Users/mailman/mail/mailman request cvs-adduser-all"
+cvs-adduser-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-adduser-all"
+cvs-adduser-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-adduser-all"
+
+darwinports-nda: "|/Users/mailman/mail/mailman post darwinports-nda"
+darwinports-nda-admin: "|/Users/mailman/mail/mailman admin darwinports-nda"
+darwinports-nda-bounces: "|/Users/mailman/mail/mailman bounces darwinports-nda"
+darwinports-nda-confirm: "|/Users/mailman/mail/mailman confirm darwinports-nda"
+darwinports-nda-join: "|/Users/mailman/mail/mailman join darwinports-nda"
+darwinports-nda-leave: "|/Users/mailman/mail/mailman leave darwinports-nda"
+darwinports-nda-owner: "|/Users/mailman/mail/mailman owner darwinports-nda"
+darwinports-nda-request: "|/Users/mailman/mail/mailman request darwinports-nda"
+darwinports-nda-subscribe: "|/Users/mailman/mail/mailman subscribe darwinports-nda"
+darwinports-nda-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe darwinports-nda"
+
+xar: "|/Users/mailman/mail/mailman post xar"
+xar-admin: "|/Users/mailman/mail/mailman admin xar"
+xar-bounces: "|/Users/mailman/mail/mailman bounces xar"
+xar-confirm: "|/Users/mailman/mail/mailman confirm xar"
+xar-join: "|/Users/mailman/mail/mailman join xar"
+xar-leave: "|/Users/mailman/mail/mailman leave xar"
+xar-owner: "|/Users/mailman/mail/mailman owner xar"
+xar-request: "|/Users/mailman/mail/mailman request xar"
+xar-subscribe: "|/Users/mailman/mail/mailman subscribe xar"
+xar-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe xar"
+
+cvs-xar-all: "|/Users/mailman/mail/mailman post cvs-xar-all"
+cvs-xar-all-admin: "|/Users/mailman/mail/mailman admin cvs-xar-all"
+cvs-xar-all-bounces: "|/Users/mailman/mail/mailman bounces cvs-xar-all"
+cvs-xar-all-confirm: "|/Users/mailman/mail/mailman confirm cvs-xar-all"
+cvs-xar-all-join: "|/Users/mailman/mail/mailman join cvs-xar-all"
+cvs-xar-all-leave: "|/Users/mailman/mail/mailman leave cvs-xar-all"
+cvs-xar-all-owner: "|/Users/mailman/mail/mailman owner cvs-xar-all"
+cvs-xar-all-request: "|/Users/mailman/mail/mailman request cvs-xar-all"
+cvs-xar-all-subscribe: "|/Users/mailman/mail/mailman subscribe cvs-xar-all"
+cvs-xar-all-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe cvs-xar-all"
+
+xar-bugs: "|/Users/mailman/mail/mailman post xar-bugs"
+xar-bugs-admin: "|/Users/mailman/mail/mailman admin xar-bugs"
+xar-bugs-bounces: "|/Users/mailman/mail/mailman bounces xar-bugs"
+xar-bugs-confirm: "|/Users/mailman/mail/mailman confirm xar-bugs"
+xar-bugs-join: "|/Users/mailman/mail/mailman join xar-bugs"
+xar-bugs-leave: "|/Users/mailman/mail/mailman leave xar-bugs"
+xar-bugs-owner: "|/Users/mailman/mail/mailman owner xar-bugs"
+xar-bugs-request: "|/Users/mailman/mail/mailman request xar-bugs"
+xar-bugs-subscribe: "|/Users/mailman/mail/mailman subscribe xar-bugs"
+xar-bugs-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe xar-bugs"
+
+mirrors: "|/Users/mailman/mail/mailman post mirrors"
+mirrors-admin: "|/Users/mailman/mail/mailman admin mirrors"
+mirrors-bounces: "|/Users/mailman/mail/mailman bounces mirrors"
+mirrors-confirm: "|/Users/mailman/mail/mailman confirm mirrors"
+mirrors-join: "|/Users/mailman/mail/mailman join mirrors"
+mirrors-leave: "|/Users/mailman/mail/mailman leave mirrors"
+mirrors-owner: "|/Users/mailman/mail/mailman owner mirrors"
+mirrors-request: "|/Users/mailman/mail/mailman request mirrors"
+mirrors-subscribe: "|/Users/mailman/mail/mailman subscribe mirrors"
+mirrors-unsubscribe: "|/Users/mailman/mail/mailman unsubscribe mirrors"
+

@@ -1,26 +1,30 @@
-#       $NetBSD: crontab,v 1.13 1997/10/26 13:36:31 lukem Exp $
-#
-# /etc/crontab - root's crontab
-#
+# /etc/crontab
 SHELL=/bin/sh
-PATH=/bin:/sbin:/usr/bin:/usr/sbin
+PATH=/etc:/bin:/sbin:/usr/bin:/usr/sbin
 HOME=/var/log
-
-#min	hour	mday	month	wday	user	command
-
-*	*	*	*	*	root	chmod g-w /
-# Disabled by default, since it causes disk access every 10 minutes,
-# which is useless unless you use at(1).  Enable as needed.
-#*/10	*	*	*	*	root	/usr/libexec/atrun
-
-# do daily/weekly/monthly maintenance
-15	3	*	*	*	root	sh /etc/daily	2>&1 | tee /var/log/daily.out	| mail -s "`hostname` daily output"   root
-30	4	*	*	6	root	sh /etc/weekly	2>&1 | tee /var/log/weekly.out	| mail -s "`hostname` weekly output"  root
-30	5	1	*	*	root	sh /etc/monthly 2>&1 | tee /var/log/monthly.out | mail -s "`hostname` monthly output" root
+RSYNC_PASSWORD=booger
+MAILTO=""
+#
+#minute	hour	mday	month	wday	who	command
+#
+#*/5	*	*	*	*	root	/usr/libexec/atrun
+#
+# Run daily/weekly/monthly jobs.
+15	3	*	*	*	root	periodic daily
+30	4	*	*	6	root	periodic weekly
+30	5	1	*	*	root	periodic monthly
 
 # local additions
-7	1	*	*	*	root	rsync -aH --delete --password-file=/var/opendarwin/secrets/rsync_secret --exclude=CVSROOT/config --exclude=CVSROOT/passwd rsync://bbraun@anoncvs.opensource.apple.com/cvs /cvs/Apple/.
-1	2	*	*	*	root	/usr/local/bin/cvs-web-push
-1	3	*	*	*	root	/etc/backup-lamancha-daily
-5	3	*	*	6	root	/etc/backup-lamancha-weekly
-10	3	1	*	*	root	/etc/backup-lamancha-monthly
+#7	1	*	*	*	root	rsync -aH --delete --password-file=/var/opendarwin/secrets/rsync_secret --exclude=CVSROOT/config --exclude=CVSROOT/passwd rsync://bbraun@anoncvs.opensource.apple.com/cvs /cvs/Apple/.
+#1	2	*	*	*	root	/usr/local/bin/cvs-web-push
+#*/30	*	*	*	*	root	/usr/local/bin/cvs-web-push 2>&1 > /dev/null
+0	17	*	*	*	root	/usr/local/bin/cvs-web-push 2>&1 > /dev/null
+10	20	*	*	*	root	/etc/backup-sancho-daily
+5	3	*	*	6	root	/etc/backup-sancho-weekly
+1	3	1	*	*	root	/etc/backup-sancho-monthly
+0,15,30,45	*	*	*	*	root	/usr/local/bin/finkrsyncup 2>&1 > /dev/null
+30	17	*	*	*	root	/usr/local/bin/finksfmirror 2>&1 | mail bbraun
+#Moved this cronjob to dulcinea
+#45	17	*	*	*	root	/usr/local/bin/finkcvsupdate 2>&1 | mail bbraun
+45	19	*	*	*	root	/usr/local/bin/distfiles 2>&1 | mail bbraun
+#0	*	*	*	*	root	/usr/sbin/apachectl graceful
