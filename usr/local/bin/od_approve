@@ -312,10 +312,23 @@ if ($req_type eq "user")
 		$sth->finish;
 	
 		if ($req_a_approve) {
+                
+                        ## Find which project they're supposed to join.
+                        ##
+                        $sth = $dbh->prepare ("SELECT p.status, r.project_id FROM od_request_projects r, od_projects p WHERE request_id=$request_id AND r.project_id=p.project_id");
+                        $sth->execute;
+                        ($proj_status, $proj_id) = $sth->fetchrow_array ();
+                        $sth->finish;
+                        ## Forbid the join if project is not active
+                        if($proj_status ne "active") {
+                                exit 0;
+                        }
+                
+                
 			$sth = $dbh->prepare ("UPDATE od_project_members SET active_flag='active'  WHERE user_id = $mbr_id");
 			$sth->execute;
 			$sth->finish;
-			$sth = $dbh->prepare ("SELECT u.unix_uid, p.unix_gid FROM od_users u, od_projects p WHERE p.project_id=$project_id AND u.user_id=$mbr_id");
+			$sth = $dbh->prepare ("SELECT u.unix_uid, p.unix_gid FROM od_users u, od_projects p WHERE p.project_id=$proj_id AND u.user_id=$mbr_id");
 			$sth->execute;
 			($unix_uid, $unix_gid) = $sth->fetchrow_array();
 			$sth->finish;
