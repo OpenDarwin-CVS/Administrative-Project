@@ -236,7 +236,7 @@ if ($req_type eq "user")
 		$sth->finish;	
 
 		open BODY, "</usr/local/bin/od_approve_user.txt" or die $!;
-		open MAIL, "|/usr/sbin/sendmail $user_email" or die $!;
+		open MAIL, "|/usr/sbin/sendmail $user_email core\@opendarwin.org" or die $!;
 		print MAIL "To: $user_email\n";
 		while (<BODY>) { print MAIL; }
 		close MAIL;

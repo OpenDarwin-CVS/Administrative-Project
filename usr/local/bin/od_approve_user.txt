@@ -1,4 +1,5 @@
 From: core@opendarwin.org
+Cc: core@opendarwin.org
 Subject: Welcome to OpenDarwin
 
 Your account has been approved.  For information about using your OpenDarwin CVS
