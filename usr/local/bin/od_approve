@@ -39,7 +39,7 @@
 ##
 
 my ($request_id, $approver_id, $timestamp) = (0, 0, 0);
-my $mailman_default_password='##removed##';
+my $mailman_default_password = join '', (0..9, 'A'..'Z', 'a'..'z')[rand 62, rand 62, rand 62, rand 62, rand 62, rand 62];
 
 while (<STDIN>) {
 	local $line;
@@ -75,10 +75,14 @@ use DBI;
 ###use strict;
 
 my ($dsn) = "DBI:mysql:OpenDarwin:localhost";
-my ($user_name) = "##removed##";
-my ($password) = "##removed##";
+my ($user_name, $password);
 my ($dbh,$sth);
 my (@ary);
+
+open OD_SECRET, "/var/od_secret" or die "/var/od_secret: $!\n";
+chomp($user_name = <OD_SECRET>);
+chomp($password = <OD_SECRET>);
+close OD_SECRET;
 
 $dbh = DBI->connect ($dsn, $user_name, $password, {RaiseError => 1});
 
