@@ -58,7 +58,7 @@ $command = $is_admin ? "" : "command=\"/usr/bin/cvs server\" ";
 $sftpcommand = $is_admin ? "" : "command=\"/usr/libexec/sftp-server\" ";
 
 if (defined($ssh_key)) {
-    $> = $unix_uid; # write the key file using the users' uid.
+#    $> = $unix_uid; # write the key file using the users' uid.
     $key_file = "authorized_keys";
     open KEYS, ">$home/.ssh/$key_file" or die "cannot open $home/.ssh/$key_file: $!";
 	@keys = split(/\n/, $ssh_key);
