@@ -1,0 +1,329 @@
+#!/usr/bin/perl -U
+# Copyright (c)  2002, Apple Computer, Inc. All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+# 
+# 1.  Redistributions of source code must retain the above copyright
+# notice, this list of conditions and the following disclaimer.
+# 
+# 2.  Redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+# 
+# 3.  Neither the name of Apple Computer, Inc. ("Apple") nor the names of
+# its contributors may be used to endorse or promote products derived from
+# this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY APPLE AND ITS CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL APPLE OR ITS CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+# THE POSSIBILITY OF SUCH DAMAGE.
+#
+## od_approve -- Utility script to initiate appropriate request approval.
+##
+## This will parse the email for a request ID and activate the appropriate
+## action for user, project, or join approval.
+##
+## Returns an obscure and obtuse email error if invoked "inappropriately".
+## May eat the mail silently for benign process errors. 
+##
+##
+
+my ($request_id, $approver_id, $timestamp) = (0, 0, 0);
+my $mailman_default_password='##removed##';
+
+while (<STDIN>) {
+	local $line;
+	chomp;
+	$line = $_;
+	if ($request_id) {next}  # 'eat' all input after the 1st req id.
+	if ($line =~ /Request ID: *([0-9a-fxA-F]+):([0-9a-fxA-F]+):([0-9a-fxA-F]+)/i ) {
+		$request_id= $1;
+		$approver_id   = $2;
+		$timestamp = $3;
+		next;
+	} # end if
+	
+} # end while.
+
+
+#print "approving req ID $request_id from user $approver_id\n";
+
+if (! $request_id) {
+	## No valid request ID parsed out of email. 
+	## we're done. 
+	exit 0;
+}
+
+#### $three_weeks = 1814400; 	 # 60 secs * 60 mins * 24 hrs * 21 days
+if ( ($timestamp + 1814400) < time )
+{
+	## This request is stale.
+	exit 0;
+}
+
+use DBI;
+###use strict;
+
+my ($dsn) = "DBI:mysql:OpenDarwin:localhost";
+my ($user_name) = "##removed##";
+my ($password) = "##removed##";
+my ($dbh,$sth);
+my (@ary);
+
+$dbh = DBI->connect ($dsn, $user_name, $password, {RaiseError => 1});
+
+$sth = $dbh->prepare ("SELECT type,requester_user_id,status,admin_approve,mentor_approve FROM od_requests WHERE id = $request_id");
+$sth->execute;
+($req_type,$req_user,$req_status,$req_a_approve,$req_m_approve) = $sth->fetchrow_array ();
+$sth->finish;
+
+#print "$req_type,$req_user,$req_status\n";
+
+# Some staus checking
+
+## If there is no request type, then perhaps something is wrong.
+##
+if (! defined ($req_type) )
+{
+	## no such pending request
+	exit 5;
+}
+
+## The request must be pending or this approval is stale. 
+if ($req_status ne "pending")
+{
+	## Request not in pending
+	exit 0;
+}
+
+## The request type should be something we are prepared to process. 
+##
+unless ($req_type eq "user" || $req_type eq "project" || $req_type eq "join"){
+	exit 6;
+}
+
+
+# Common flag checking for all types of request
+$is_mentor = 0;
+$is_admin = 0;
+if ((!$req_m_approve) && ($req_type eq 'user'))
+{
+	# no mentor approval yet, can this guy be a mentor?
+	$sth = $dbh->prepare ("SELECT u.status, m.status FROM od_mentors m, od_users u WHERE m.user_id=$req_user AND m.mentor_id=$approver_id AND u.user_id=$approver_id");
+	$sth->execute;
+	($user_status,$mentor_status) = $sth->fetchrow_array ();
+	$sth->finish;
+	$is_mentor = (($mentor_status eq "active")&&($user_status eq 'active')) ? 1 : 0;
+} 
+
+if (!$req_a_approve) 
+{
+	# no admin approval yet, is this guy an admin?
+	if ($req_type ne 'join') {
+		$sth = $dbh->prepare ("SELECT status FROM od_project_admins WHERE project_id=1 AND user_id=$approver_id");
+		$sth->execute;
+		($admin_status) = $sth->fetchrow_array ();
+		$sth->finish;
+	} else {
+		$sqlstr = "select a.status from od_project_admins a, od_request_projects r where r.request_id=70 and a.project_id=r.project_id and a.user_id=1";
+		$sth = $dbh->prepare( $sqlstm );
+		$sth->execute;
+                ($admin_status) = $sth->fetchrow_array ();
+		$sth->finish;
+	}
+	$is_admin = ($admin_status eq "active") ? 1 : 0;
+}
+
+if ( ( ! $is_mentor) && ( ! $is_admin) )
+{
+	# Not an admin, not a mentor, this is bogus.
+	#print "You're not an admin. go away.\n";
+	exit 7;
+}
+
+$req_m_approve = ($req_m_approve) ? 1 : $is_mentor;
+$req_a_approve = ($req_a_approve) ? 1 : $is_admin;
+
+#print "evaluate approvals: $req_m_approve $req_a_approve\n";
+
+$sth = $dbh->prepare ("UPDATE od_requests SET admin_approve=$req_a_approve,mentor_approve=$req_m_approve WHERE id=$request_id");
+$sth->execute;
+$sth->finish;
+
+
+if ($req_type eq "user")
+{
+	#If user status is active, discard this email!
+	$sth = $dbh->prepare ("SELECT status FROM od_users WHERE user_id=$req_user");
+	$sth->execute;
+	($user_status) = $sth->fetchrow_array ();
+	$sth->finish;
+	
+	## User is active
+	if($user_status eq "active"){
+		exit 0;
+	}
+
+	
+	if ($req_m_approve && $req_a_approve) 
+	{
+		$sth = $dbh->prepare ("UPDATE od_requests SET status=\"approved\",status_date=NOW() WHERE id = $request_id");
+		$sth->execute;
+		$sth->finish;
+		$sth = $dbh->prepare ("UPDATE od_users SET status=\"active\",status_date=NOW() WHERE user_id = $req_user");
+		$sth->execute;
+		$sth->finish;
+		$sth = $dbh->prepare ("SELECT name,realname,shell,ssh_key FROM od_users WHERE user_id = $req_user");
+		$sth->execute;
+		($name, $realname, $shell,$ssh_key) = $sth->fetchrow_array ();
+		$ENV{'OD_USER_NAME'} = $name;
+		$ENV{'OD_REAL_NAME'} = $realname;
+		$ENV{'OD_SHELL_PREF'} = $shell;
+		$sth->finish;		
+		open ADD, "/usr/local/bin/od_adduser |";
+		$new_uid = <ADD>;
+		chomp $new_uid;
+		$new_home = <ADD>;
+		chomp $new_home;
+		close ADD;
+		#print "UPDATE od_users SET unix_uid=$new_uid,status='active',status_date=NOW() WHERE user_id=$req_user\n";
+		$sth = $dbh->prepare ("UPDATE od_users SET unix_uid=$new_uid,status='active',status_date=NOW() WHERE user_id=$req_user");
+		$sth->execute;
+		$sth->finish;
+		
+		if (defined($ssh_key)) {
+			$key_file = "authorized_keys";
+			open KEYS, ">$new_home/.ssh/$key_file" or die "cannot open $new_home/.ssh/$key_file: $!";
+			print KEYS $ssh_key, "\n";
+			close KEYS;
+		}
+	}
+	
+	exit 0;
+
+# End of "user" request type.
+} elsif ($req_type eq "project") {
+
+	#print "Working on project request.\n";
+	
+	## If Project status is active, discard this email! (Approval is stale.)
+	##
+	$sth = $dbh->prepare ("SELECT p.status, r.project_id, p.name FROM od_request_projects r, od_projects p WHERE request_id=$request_id AND r.project_id=p.project_id");
+	$sth->execute;
+	($proj_status, $proj_id, $proj_name) = $sth->fetchrow_array ();
+	$sth->finish; 
+	## Project is active
+	if($proj_status eq "active") {
+		exit 0;
+	}
+	
+
+	
+	if ($req_a_approve) {
+		## Get requestor's email, that becomes the mailing list admin.
+		##
+		#print "SELECT email FROM od_users WHERE user_id=$req_user\n";
+		$sth = $dbh->prepare("SELECT email FROM od_users WHERE user_id=$req_user");
+		$sth->execute;
+		($proj_admin) = $sth->fetchrow_array ();
+		$sth->finish;
+
+		## create the project
+		## This creates a cvs project, a mailing list set, mail_aliases, and a new GID for the project members. 
+		##
+		$ENV{'OD_PROJ_NAME'} = $proj_name;
+		$ENV{'OD_PROJ_ADMIN'} = $proj_admin;
+		$ENV{'OD_MAILMAN_DEFAULT_PASSWORD'} = $mailman_default_password;
+		open NEWPROJ, "/usr/local/bin/od_newproj |";
+                $new_gid = <NEWPROJ>; 
+                chomp $new_gid;
+		close NEWPROJ;
+		
+		## Update request record status to 'approved'.
+		##
+		#print "UPDATE od_requests SET status=\"approved\",status_date=NOW() WHERE id = $request_id\n";
+		$sth = $dbh->prepare ("UPDATE od_requests SET status=\"approved\",status_date=NOW() WHERE id = $request_id");
+		$sth->execute;
+		$sth->finish;
+
+		## Update project record status to 'active'
+		#
+		#print "UPDATE od_projects SET unix_gid=$new_gid,status=\"active\",status_date=NOW() WHERE project_id = $proj_id\n";
+		$sth = $dbh->prepare ("UPDATE od_projects SET unix_gid=$new_gid,status=\"active\",status_date=NOW() WHERE project_id = $proj_id");
+		$sth->execute;
+		$sth->finish;
+	
+		## Update project member table to reflect this user is an active member.
+		##
+		#print "UPDATE od_project_members SET active_flag='active',date_added=NOW() WHERE project_id = $proj_id\n";
+		$sth = $dbh->prepare ("UPDATE od_project_members SET active_flag='active',date_added=NOW() WHERE project_id = $proj_id");
+		$sth->execute;
+		$sth->finish;
+
+		## This user, being the requesting user, will become the project admin.
+		##
+		$sqlstm = "INSERT INTO od_project_admins VALUES($proj_id,$req_user,'active')";
+		#print $sqlstm, "\n";
+		$sth = $dbh->prepare ($sqlstm);
+		$sth->execute;
+		$sth->finish;
+
+		## Add this user to the system group.
+		##
+		$sth = $dbh->prepare ("SELECT u.unix_uid, p.unix_gid FROM od_users u, od_projects p WHERE p.project_id=$proj_id AND u.user_id=$req_user");
+		$sth->execute;
+		($unix_uid, $unix_gid) = $sth->fetchrow_array();
+		$sth->finish;
+		$ENV{'OD_UID'}=$unix_uid;
+		$ENV{'OD_GID'}=$unix_gid;
+		exec "/usr/local/bin/od_joingroup"
+	}
+		exit 0;
+# End of "project" request type.
+} elsif ($req_type eq "join") {
+	
+		#If user is a member already, discard this email!
+                $sth = $dbh->prepare ("SELECT m.active_flag, m.user_id FROM od_project_members m, od_requests r WHERE r.id = $request_id AND m.user_id=r.requester_user_id");
+		$sth->execute;
+		if(($mbr_status, $mbr_id) = $sth->fetchrow_array ()){
+			if($mbr_status ne 'pending') {
+				#invalid request, should never happen.
+				exit 0;
+			}
+		} else {
+			#invalid request, should never happen.
+			exit 0;
+		};
+		
+		$sth->finish;
+	
+		if ($req_a_approve) {
+			$sth = $dbh->prepare ("UPDATE od_project_members SET active_flag='active'  WHERE user_id = $mbr_id");
+			$sth->execute;
+			$sth->finish;
+			$sth = $dbh->prepare ("SELECT u.unix_uid, p.unix_gid FROM od_users u, od_projects p WHERE p.project_id=$project_id AND u.user_id=$mbr_id");
+			$sth->execute;
+			($unix_uid, $unix_gid) = $sth->fetchrow_array();
+			$sth->finish;
+			$ENV{'OD_UID'}=$unix_uid;
+			$ENV{'OD_GID'}=$unix_gid;
+			system "/usr/local/bin/od_joingroup"
+		}
+		
+		exit 0;
+# End of "join" request type.
+	}
+
+
+## Successful completion.
+exit 0;

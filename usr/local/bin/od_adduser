@@ -1,0 +1,106 @@
+#!/usr/bin/perl -U
+# Copyright (c)  2002, Apple Computer, Inc. All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+# 
+# 1.  Redistributions of source code must retain the above copyright
+# notice, this list of conditions and the following disclaimer.
+# 
+# 2.  Redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+# 
+# 3.  Neither the name of Apple Computer, Inc. ("Apple") nor the names of
+# its contributors may be used to endorse or promote products derived from
+# this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY APPLE AND ITS CONTRIBUTORS "AS IS" AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL APPLE OR ITS CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+# THE POSSIBILITY OF SUCH DAMAGE.
+#
+## od_adduser -- Utility script Add new user to  system-dependent database.
+##
+## This will add a new OpenDarwin user to the underlying UNIX user db.
+## This db could be /etc/passwd, NIS, LDAP, NetInfo or whatever. 
+## This implementation adds to the local netinfo domain.
+##
+## W A R N I N G:  There is a race condition between this script and 
+##                 the std. Mac OS X Add User from the System Prefs panel.
+##                 This race could allow two users to be created with the
+##                 same UID.
+##
+##
+## C O M M A N D  L I N E   A R G U M E N T S 
+##
+$user = $ENV{'OD_USER_NAME'};			# login name
+$realname = $ENV{'OD_REAL_NAME'};		# long name (gecos data)
+$shell = $ENV{'OD_SHELL_PREF'};			# shell
+
+##
+## C O N S T A N T S
+##
+$default_gid = 20;
+$lockfile = "/tmp/adduser.LOCK";
+$home_path = "/Users";
+$default_shell = "/bin/sh";
+$home = "";					# home directory
+
+$shell = ($shell eq "") ? $default_shell : $shell;
+$home = ($home eq "") ? "$home_path/$user" : $home;
+
+system "/usr/bin/lockfile -r-1 $lockfile";
+
+$uid = &get_new_uid();
+
+open NICL, "| nicl . > /dev/null";
+print NICL "create /users/$user uid $uid\n";
+print NICL "create /users/$user passwd *\n";
+print NICL "create /users/$user gid $default_gid\n";
+print NICL "create /users/$user realname \"$realname\"\n";
+print NICL "create /users/$user home $home\n";
+print NICL "create /users/$user shell $shell\n";
+print NICL "quit\n";
+close NICL;
+
+system "/bin/rm -f $lockfile";
+print $uid, "\n";
+print $home, "\n";
+
+mkdir $home, 0755;
+mkdir "$home/.ssh", 0755;	
+chown $uid, $default_gid, $home;
+chown $uid, $default_gid, "$home/.ssh";
+
+exit 0;
+
+## get_new_uid()
+##
+## This sub will scan the current netinfo db and extract the highest
+## numbered uid currently in use. 
+##
+sub get_new_uid() {
+	local $high_uid = 5317;   # Magic number decreed by rbraun.
+	local $a_uid = 0;
+	local $junk;
+
+	# Following is the cleanest I can do from a perl script.
+	# I'd love to have an api for this.
+	open UID, "nicl . list /users uid |";
+	while (<UID>) {
+		chomp;
+		($junk, $a_uid) = split / +/;
+		$high_uid = ($high_uid < $a_uid) ? $a_uid : $high_uid;
+	}
+	close UID;
+	return ++$high_uid;
+}

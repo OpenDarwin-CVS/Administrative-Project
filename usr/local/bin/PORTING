@@ -1,0 +1,15 @@
+How these scripts may need to modified/re-written per platform:
+	
+	od_activate_lists	- tied to sendmail directories.
+
+	od_adduser 		- tied to system specifics of adding users.
+
+        od_approve		- tied to DBM specifics
+
+	od_create_lists		- Tied to mailing list manager (mailman).
+
+	od_newproj		- Tied to:
+					system specifics of adding groups
+					CVS directory layout.
+
+
