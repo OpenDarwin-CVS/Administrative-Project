@@ -21,8 +21,12 @@ $passwd   = $ENV{'OD_PASSWORD'};		# password
 die "Invalid user name: $user" if !$user or ($user =~ m/[^A-Z0-9_]/i);
 
 $salt = join '', ('.', '/', 0..9, 'A'..'Z', 'a'..'z')[rand 64, rand 64];
-$passwd = crypt($passwd, $salt);
+$cpasswd = crypt($passwd, $salt);
 
-system("/usr/bin/niutil -createprop . /users/$user passwd $passwd");
+system("/usr/bin/niutil -createprop . /users/$user passwd $cpasswd");
+
+open SASL, "|/usr/local/bin/saslpasswd2 -c -a Sendmail $user" or die "cannot set sasl password: $!";
+print SASL "$passwd";
+close SASL;
 
 exit $?;
