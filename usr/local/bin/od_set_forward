@@ -13,14 +13,13 @@
 ## C O M M A N D  L I N E   A R G U M E N T S 
 ##
 $user     = $ENV{'OD_USER_NAME'};		# login name
-$passwd   = $ENV{'OD_PASSWORD_MD5'};		# md5 of password
+$passwd   = $ENV{'OD_PASSWORD'};		# password
 
 ##
 ## C O N S T A N T S
 ##
 
 die "Invalid user name: $user" if !$user or ($user =~ m/[^A-Z0-9_]/i);
-die "Invalid password md5: $passwd" if !$passwd or ($passwd =~ m/[^A-F0-9]/i);
 
 open NIUTIL, "niutil -readprop / /users/$user home |" or die "Cannot find home for $user: $!";
 chomp($home = <NIUTIL>);
@@ -41,10 +40,13 @@ close OD_SECRET;
 
 $dbh = DBI->connect ($dsn, $user_name, $password, {RaiseError => 1});
 
-$sth = $dbh->prepare ("SELECT unix_uid, email, forward FROM od_users WHERE name='$user' AND password='$passwd'");
+$psql = defined($passwd) ? "AND password=md5('" . $dbh->quote($passwd) . "')" : "";
+$sth = $dbh->prepare ("SELECT unix_uid, email, forward FROM od_users WHERE name='$user' $psql");
 $sth->execute;
 ($unix_uid, $email, $forward) = $sth->fetchrow_array ();
 $sth->finish;
+
+die "Bad password or unknown user: $user" if !defined($unix_uid);
 
 $> = $unix_uid; # write the .forward file using the users' uid.
 $file = ".forward";

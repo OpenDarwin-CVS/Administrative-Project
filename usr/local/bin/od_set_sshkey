@@ -13,14 +13,13 @@
 ## C O M M A N D  L I N E   A R G U M E N T S 
 ##
 $user     = $ENV{'OD_USER_NAME'};		# login name
-$passwd   = $ENV{'OD_PASSWORD_MD5'};		# md5 of password
+$passwd   = $ENV{'OD_PASSWORD'};		# password
 
 ##
 ## C O N S T A N T S
 ##
 
 die "Invalid user name: $user" if !$user or ($user =~ m/[^A-Z0-9_]/i);
-die "Invalid password md5: $passwd" if !$passwd or ($passwd =~ m/[^A-F0-9]/i);
 
 open NIUTIL, "niutil -readprop / /users/$user home |" or die "Cannot find home for $user: $!";
 chomp($home = <NIUTIL>);
@@ -41,10 +40,21 @@ close OD_SECRET;
 
 $dbh = DBI->connect ($dsn, $user_name, $password, {RaiseError => 1});
 
-$sth = $dbh->prepare ("SELECT ssh_key, unix_uid FROM od_users WHERE name='$user' AND password='$passwd'");
+$psql = defined($passwd) ? "AND password=md5('" . $dbh->quote($passwd) . "')" : "";
+$sth = $dbh->prepare ("SELECT ssh_key, unix_uid, user_id FROM od_users WHERE name='$user' $psql");
 $sth->execute;
-($ssh_key, $unix_uid) = $sth->fetchrow_array ();
+($ssh_key, $unix_uid, $user_id) = $sth->fetchrow_array ();
 $sth->finish;
+
+die "Bad password or unknown user: $user" if !$user_id;
+
+# Restrict ssh access to the CVS server.
+# Unrestrict shell access for administrative members.
+$sth = $dbh->prepare("SELECT 1 FROM od_project_members WHERE project_id=1 AND user_id=$user_id");
+$sth->execute;
+($is_admin) = $sth->fetchrow_array();
+$sth->finish;
+$command = $is_admin ? "" : "command=\"/usr/bin/cvs server\" ";
 
 if (defined($ssh_key)) {
     $> = $unix_uid; # write the key file using the users' uid.
@@ -52,7 +62,7 @@ if (defined($ssh_key)) {
     open KEYS, ">$home/.ssh/$key_file" or die "cannot open $home/.ssh/$key_file: $!";
 	@keys = split(/\n/, $ssh_key);
 	foreach $key (@keys) {
-		print KEYS "command=\"/usr/bin/cvs server\" " . $key . "\n";
+		print KEYS $command . $key . "\n";
 	}
     close KEYS;
 }

@@ -218,7 +218,6 @@ if ($req_type eq "user")
 		$sth->execute;
 		$sth->finish;
 		
-		$ENV{'OD_PASSWORD_MD5'} = $password;
 		system "/usr/local/bin/od_set_sshkey";
 
 		##
