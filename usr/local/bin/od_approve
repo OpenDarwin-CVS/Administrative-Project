@@ -236,9 +236,9 @@ if ($req_type eq "user")
 		$sth->finish;	
 
 		open BODY, "</usr/local/bin/od_approve_user.txt" or die $!;
-		open MAIL, "|/usr/sbin/sendmail $user_email core\@opendarwin.org" or die $!;
-		print MAIL "To: $user_email\n";
+		open MAIL, "|/usr/sbin/sendmail -t" or die $!;
 		while (<BODY>) { 
+			s/%email%/$user_email/g;
 			s/%realname%/$realname/g;
 			print MAIL; 
 		}
@@ -323,7 +323,7 @@ if ($req_type eq "user")
 		$sth->finish;
 		$ENV{'OD_UID'}=$unix_uid;
 		$ENV{'OD_GID'}=$unix_gid;
-		exec "/usr/local/bin/od_joingroup"
+		exec "/usr/local/bin/od_joingroup";
 
                 ##
                 ## Mail the user notification of their new project.
@@ -334,9 +334,9 @@ if ($req_type eq "user")
                 $sth->finish;
 
                 open BODY, "</usr/local/bin/od_approve_project.txt" or die $!;
-                open MAIL, "|/usr/sbin/sendmail $user_email core\@opendarwin.org" or die $!;
-                print MAIL "To: $user_email\n";
+                open MAIL, "|/usr/sbin/sendmail -t" or die $!;
                 while (<BODY>) {
+			s/%email%/$user_email/g;
                         s/%realname%/$realname/g;
 			s/%projname%/$projname/g;
                         print MAIL;  
@@ -386,7 +386,7 @@ if ($req_type eq "user")
 			$sth->finish;
 			$ENV{'OD_UID'}=$unix_uid;
 			$ENV{'OD_GID'}=$unix_gid;
-			system "/usr/local/bin/od_joingroup"
+			system "/usr/local/bin/od_joingroup";
 
 			##
 	                ## Mail the user notification of their new project.
@@ -397,9 +397,9 @@ if ($req_type eq "user")
 			$sth->finish;
 
 			open BODY, "</usr/local/bin/od_approve_join.txt" or die $!;
-			open MAIL, "|/usr/sbin/sendmail $user_email core\@opendarwin.org" or die $!;
-			print MAIL "To: $user_email\n";
+			open MAIL, "|/usr/sbin/sendmail -t" or die $!;
 			while (<BODY>) {
+				s/%email%/$user_email/g;
 				s/%realname%/$realname/g;
 				s/%projname%/$projname/g;
                         	print MAIL;

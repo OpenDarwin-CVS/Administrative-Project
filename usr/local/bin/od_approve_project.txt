@@ -1,3 +1,4 @@
+To: %email%
 From: core@opendarwin.org
 Cc: core@opendarwin.org
 Subject: OpenDarwin project %projname%
