@@ -28,7 +28,7 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-ADMIN_THINGS = od_activate_lists od_adduser od_approve od_joingroup od_newproj od_wrapper
+ADMIN_THINGS = od_activate_lists od_adduser od_approve od_joingroup od_newproj od_wrapper odpasswd odvissh
 MAIL_LIST_THINGS = od_create_lists
 WEB_THINGS = od_set_sshkey od_web_wrapper od_set_forward od_set_passwd
 TEXT_THINGS = od_approve_user.txt od_approve_join.txt od_approve_project.txt
