@@ -30,6 +30,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 
 extern char *sys_errorlist;
 extern int sys_nerr;
@@ -58,6 +59,6 @@ int main(int argc, char* argv[], char* envp[] )
 	execve(file_to_run, argv, envp);
 
 	perror(NULL);
-        return 0;
+        return errno;
 }
 
