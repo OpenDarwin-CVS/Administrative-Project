@@ -1,0 +1,21 @@
+@	IN	SOA	opendarwin.org.	root.opendarwin.org.	(
+								2002062600
+								3600
+								3600
+								3600
+								3600 )
+            IN	NS    ns1
+            IN  NS    ns2
+            IN	A     204.152.186.42
+            IN  MX 10 mail.opendarwin.org.
+zool        IN  A     204.152.186.42
+ns1         IN	A     204.152.186.42
+ns-rc       IN	A     204.152.186.42
+ns2         IN  A     204.152.188.7
+lamancha    IN  A     204.152.186.42
+rsync       IN  A     204.152.186.42
+anoncvs     IN  A     204.152.186.42
+cvs         IN  A     204.152.186.42
+mail        IN  A     204.152.186.42
+new         IN  A     204.152.186.42
+www         IN	CNAME zool

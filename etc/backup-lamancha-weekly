@@ -1,0 +1,11 @@
+#!/bin/sh
+
+. /etc/backup-lamancha-common
+
+if cd /Volumes/back; then
+    RotateBackups src.weekly.tar.gz
+    ln src.daily.tar.gz src.weekly.tar.gz
+    
+    RotateBackups mysql.weekly.gz
+    ln mysql.daily.gz mysql.weekly.gz
+fi

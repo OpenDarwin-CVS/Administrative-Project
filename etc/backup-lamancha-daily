@@ -1,0 +1,21 @@
+#!/bin/sh
+
+. /etc/backup-lamancha-common
+
+## Backup CVS repositories
+##
+FILE=src.daily.tar.gz
+if cd /Volumes/back; then
+    RotateBackups $FILE
+    gnutar czPf $FILE /Volumes/src
+fi
+
+## Backup Mysql databases
+##
+FILE=mysql.daily
+if cd /Volumes/back; then
+    RotateBackups "${FILE}.gz"
+    export MYSQL_PWD=$(head -n 1 /var/opendarwin/secrets/backup_mysql_secret)
+    /usr/local/mysql/bin/mysqldump --all -uroot --result-file=$FILE --all-databases
+    [ -f $FILE ] && gzip -9 $FILE
+fi
