@@ -200,9 +200,9 @@ if ($req_type eq "user")
 		$sth = $dbh->prepare ("UPDATE od_users SET status=\"active\",status_date=NOW() WHERE user_id = $req_user");
 		$sth->execute;
 		$sth->finish;
-		$sth = $dbh->prepare ("SELECT name,realname,shell,ssh_key FROM od_users WHERE user_id = $req_user");
+		$sth = $dbh->prepare ("SELECT name,realname,shell,password FROM od_users WHERE user_id = $req_user");
 		$sth->execute;
-		($name, $realname, $shell,$ssh_key) = $sth->fetchrow_array ();
+		($name, $realname, $shell, $password) = $sth->fetchrow_array ();
 		$ENV{'OD_USER_NAME'} = $name;
 		$ENV{'OD_REAL_NAME'} = $realname;
 		$ENV{'OD_SHELL_PREF'} = $shell;
@@ -218,14 +218,8 @@ if ($req_type eq "user")
 		$sth->execute;
 		$sth->finish;
 		
-		if (defined($ssh_key)) {
-			# Filter ^M garbage, et al.
-			$ssh_key =~ s|[^a-zA-Z0-9/+=\@\. -]||g;
-			$key_file = "authorized_keys";
-			open KEYS, ">$new_home/.ssh/$key_file" or die "cannot open $new_home/.ssh/$key_file: $!";
-			print KEYS $ssh_key, "\n";
-			close KEYS;
-		}
+		$ENV{'OD_PASSWORD_MD5'} = $password;
+		system "/usr/local/bin/od_set_sshkey";
 
 		##
 		## Mail the user notification of their new account.
