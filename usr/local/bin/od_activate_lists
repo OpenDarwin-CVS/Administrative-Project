@@ -29,6 +29,7 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+export PATH="${PATH}:/usr/local/bin"
 cd /etc/mail
 cat /tmp/$OD_PROJ_NAME >>/etc/mail/aliases
 /usr/bin/newaliases
