@@ -42,7 +42,6 @@ $gid = &get_new_gid();
 open NICL, "| nicl . > /dev/null";
 print NICL "create /groups/$PROJ_NAME gid $gid\n";
 print NICL "create /groups/$PROJ_NAME passwd *\n";
-print NICL "create /groups/$PROJ_NAME users root\n";
 print NICL "quit\n";
 close NICL;
 
