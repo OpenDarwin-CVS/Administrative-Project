@@ -34,3 +34,6 @@ cd /Users/mailman
 
 # newlist prompts for confirmation to send a mail to the list owner.
 echo 'y' | ./bin/newlist --output=/tmp/$OD_PROJ_NAME $OD_PROJ_NAME $OD_PROJ_ADMIN $OD_MAILMAN_DEFAULT_PASSWORD > /dev/null
+
+# also create a list for cvs log messages.
+echo 'y' | ./bin/newlist --output=/tmp/cvs-${OD_PROJ_NAME}-all cvs-${OD_PROJ_NAME}-all $OD_PROJ_ADMIN $OD_MAILMAN_DEFAULT_PASSWORD > /dev/null
