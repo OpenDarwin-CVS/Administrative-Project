@@ -80,8 +80,8 @@ mkdir $home, 0755;
 mkdir "$home/.ssh", 0755;	
 mkdir "$home/.sftp", 0755;	
 chown $uid, $default_gid, $home;
-chown $uid, $default_gid, "$home/.ssh";
-chown $uid, $default_gid, "$home/.sftp";
+chown root, staff, "$home/.ssh";
+chown root, staff, "$home/.sftp";
 
 exit 0;
 

@@ -73,5 +73,7 @@ if (defined($ssh_key)) {
 	}
     close KEYS;
 }
+`/usr/bin/chflags uchg $home/.ssh`;
+`/usr/bin/chflags uchg $home/.sftp`;
 
 exit 0;
