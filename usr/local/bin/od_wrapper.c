@@ -52,6 +52,9 @@ int main(int argc, char* argv[], char* envp[] )
 	   case 4:
 		file_to_run = "/usr/local/bin/od_joingroup";
 		break;
+           case 5:
+                file_to_run = "/usr/local/bin/od_set_sshkey";
+                break;
 	   default:
 		exit -1;
 	}

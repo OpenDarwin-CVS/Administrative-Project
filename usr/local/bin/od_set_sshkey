@@ -1,0 +1,53 @@
+#!/usr/bin/perl -U
+##
+## od_set_sshkey
+## Kevin Van Vechten | kevin@opendarwin.org
+##
+## This script performs an authentication check of the specified
+## username and password combination, and if successful, will append
+## the specified ssh-key to the user's authorized_keys file.  Invalid
+## characters will be filtered from the key.
+##
+## Note: This script operates on the local NetInfo domain.
+##
+## C O M M A N D  L I N E   A R G U M E N T S 
+##
+$user     = $ENV{'OD_USER_NAME'};		# login name
+
+##
+## C O N S T A N T S
+##
+
+die "Invalid user name: $user" if !$user or ( $user =~ s/[^A-Za-z0-9_]// );
+
+open NIUTIL, "niutil -readprop / /users/$user home |" or die "Cannot find home for $user: $!";
+chomp($home = <NIUTIL>);
+close NIUTIL;
+
+use DBI;
+
+my ($dsn) = "DBI:mysql:OpenDarwin:localhost";
+my ($user_name, $password);
+my ($dbh,$sth);
+my (@ary);
+
+open OD_SECRET, "/var/od_secret" or die "/var/od_secret: $!";
+chomp($user_name = <OD_SECRET>);
+chomp($password = <OD_SECRET>);
+close OD_SECRET;
+
+$dbh = DBI->connect ($dsn, $user_name, $password, {RaiseError => 1});
+
+$sth = $dbh->prepare ("SELECT ssh_key FROM od_users WHERE name='$user'");
+$sth->execute;
+($ssh_key) = $sth->fetchrow_array ();
+$sth->finish;
+
+if (defined($ssh_key)) {
+    $key_file = "authorized_keys";
+    open KEYS, ">$home/.ssh/$key_file" or die "cannot open $home/.ssh/$key_file: $!";
+    print KEYS $ssh_key, "\n";
+    close KEYS;
+}
+
+exit 0;
