@@ -40,3 +40,4 @@ FEATURE(`masquerade_envelope')
 FEATURE(`always_add_domain')
 MAILER(smtp)
 MAILER(procmail)
+TRUST_AUTH_MECH(`CRAM-MD5 DIGEST-MD5')dnl
