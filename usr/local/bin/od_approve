@@ -45,13 +45,16 @@ while (<STDIN>) {
 	local $line;
 	chomp;
 	$line = $_;
-	if ($request_id) {next}  # 'eat' all input after the 1st req id.
-	if ($line =~ /Request ID: *([0-9a-fxA-F]+):([0-9a-fxA-F]+):([0-9a-fxA-F]+)/i ) {
+	# 'eat' all input after the 1st req id.
+	if (!$request_id and $line =~ /Request ID: *([0-9a-fxA-F]+):([0-9a-fxA-F]+):([0-9a-fxA-F]+)/i ) {
 		$request_id= $1;
 		$approver_id   = $2;
 		$timestamp = $3;
 		next;
 	} # end if
+        if (!$from and $line =~ /From: (.*)/i ) {
+                $from = $1;
+        }
 	
 } # end while.
 
@@ -92,6 +95,15 @@ $sth->execute;
 $sth->finish;
 
 #print "$req_type,$req_user,$req_status\n";
+
+
+## Log this approval attempt, and the current project status.
+##
+$sqlstm = sprintf("INSERT INTO od_approve_log (request_id, approver_id, email, request_status) VALUES ($request_id, $approver_id, %s, $req_status)", $dbh->quote($from));
+#print $sqlstm, "\n";
+$sth = $dbh->prepare ($sqlstm);
+$sth->execute;
+$sth->finish;
 
 # Some staus checking
 
