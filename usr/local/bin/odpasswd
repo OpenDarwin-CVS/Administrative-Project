@@ -60,7 +60,7 @@ if ($password1 ne $password2) {
 } else {
     # Update the database.
     $password2 = $dbh->quote($password1);
-    $sth = $dbh->prepare("UPDATE od_users SET password=$password2 WHERE user_id=$user_id");
+    $sth = $dbh->prepare("UPDATE od_users SET password=md5($password2) WHERE user_id=$user_id");
     $sth->execute;
     $sth->finish;
 
