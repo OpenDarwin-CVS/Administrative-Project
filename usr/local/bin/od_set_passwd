@@ -1,0 +1,28 @@
+#!/usr/bin/perl -U
+##
+## od_set_passwd
+## Kevin Van Vechten | kevin@opendarwin.org
+##
+## This script performs an authentication check of the specified
+## username and password combination, and if successful, will
+## change the users password.
+##
+## Note: This script operates on the local NetInfo domain.
+##
+## C O M M A N D  L I N E   A R G U M E N T S 
+##
+$user     = $ENV{'OD_USER_NAME'};		# login name
+$passwd   = $ENV{'OD_PASSWORD'};		# password
+
+##
+## C O N S T A N T S
+##
+
+die "Invalid user name: $user" if !$user or ($user =~ m/[^A-Z0-9_]/i);
+
+$salt = join '', ('.', '/', 0..9, 'A'..'Z', 'a'..'z')[rand 64, rand 64];
+$passwd = crypt($passwd, $salt);
+
+system("/usr/bin/niutil -createprop . /users/$user passwd $passwd");
+
+exit $?;

@@ -40,14 +40,17 @@ int main(int argc, char* argv[], char* envp[] )
 	char * file_to_run = "";
 	int option = atoi(argv[1]);
 	switch (option) {
-  	   case 1:
-                file_to_run = "/usr/local/bin/od_set_sshkey";
-                break;
-	   case 2:
-		file_to_run = "/usr/local/bin/od_set_forward";
-		break;
-	   default:
-		exit -1;
+		case 1:
+			file_to_run = "/usr/local/bin/od_set_sshkey";
+			break;
+		case 2:
+			file_to_run = "/usr/local/bin/od_set_forward";
+			break;
+		case 3:
+			file_to_run = "/usr/local/bin/od_set_passwd";
+			break;
+		default:
+			exit -1;
 	}
 	execve(file_to_run, argv, envp);
 

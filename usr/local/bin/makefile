@@ -30,7 +30,7 @@
 
 ADMIN_THINGS = od_activate_lists od_adduser od_approve od_joingroup od_newproj od_wrapper
 MAIL_LIST_THINGS = od_create_lists
-WEB_THINGS = od_set_sshkey od_web_wrapper od_set_forward
+WEB_THINGS = od_set_sshkey od_web_wrapper od_set_forward od_set_passwd
 TEXT_THINGS = od_approve_user.txt od_approve_join.txt od_approve_project.txt
 PRODUCTS = ${ADMIN_THINGS} ${MAIL_LIST_THINGS} ${WEB_THINGS} ${TEXT_THINGS}
 WRAPPER_THINGS = od_wrapper od_create_lists od_web_wrapper
