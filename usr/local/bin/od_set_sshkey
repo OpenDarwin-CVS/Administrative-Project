@@ -41,12 +41,13 @@ close OD_SECRET;
 
 $dbh = DBI->connect ($dsn, $user_name, $password, {RaiseError => 1});
 
-$sth = $dbh->prepare ("SELECT ssh_key FROM od_users WHERE name='$user' AND password='$passwd'");
+$sth = $dbh->prepare ("SELECT ssh_key, unix_uid FROM od_users WHERE name='$user' AND password='$passwd'");
 $sth->execute;
-($ssh_key) = $sth->fetchrow_array ();
+($ssh_key, $unix_uid) = $sth->fetchrow_array ();
 $sth->finish;
 
 if (defined($ssh_key)) {
+    $> = $unix_uid; # write the key file using the users' uid.
     $key_file = "authorized_keys";
     open KEYS, ">$home/.ssh/$key_file" or die "cannot open $home/.ssh/$key_file: $!";
     print KEYS $ssh_key, "\n";
