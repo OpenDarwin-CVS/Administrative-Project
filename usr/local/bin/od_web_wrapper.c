@@ -43,6 +43,9 @@ int main(int argc, char* argv[], char* envp[] )
   	   case 1:
                 file_to_run = "/usr/local/bin/od_set_sshkey";
                 break;
+	   case 2:
+		file_to_run = "/usr/local/bin/od_set_forward";
+		break;
 	   default:
 		exit -1;
 	}
