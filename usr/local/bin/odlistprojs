@@ -1,37 +1,11 @@
-#!/usr/bin/perl -U
-##
-## odpasswd
-## Rob Braun | bbraun@opendarwin.org
-##
-## This script, when run as a privileged user, lists the opendarwin projects
-##
+#!/bin/sh
 
-##
-## C O N S T A N T S
-##
+# export all project common names as a sorted list
 
-die "Must be run as root.\n" if $> != 0;
-
-use DBI;
-
-my ($dsn) = "DBI:mysql:OpenDarwin:localhost";
-my ($project);
-my ($dbh,$sth);
-my (@ary);
-
-my $secret = "/var/opendarwin/secrets/od_approve_secret";
-open OD_SECRET, $secret or die "$secret: $!\n";                  
-chomp($user_name = <OD_SECRET>);
-chomp($password = <OD_SECRET>);
-close OD_SECRET;
-
-$dbh = DBI->connect ($dsn, $user_name, $password, {RaiseError => 1});
-
-$sth = $dbh->prepare ("SELECT name FROM od_projects");
-$sth->execute;
-while ($project = $sth->fetchrow_array ()) {
-	print "$project\n";
-}
-$sth->finish;
-
-exit 0;
+ldapsearch \
+	-x \
+	-D uid=diradmin,cn=users,dc=opendarwin,dc=org \
+	-y /var/opendarwin/secrets/ldap_admin.txt \
+	-b cn=groups,dc=opendarwin,dc=org \
+	'(objectClass=odProject)' cn \
+| grep ^cn: | cut -f 2- -d ' ' | sort | uniq
