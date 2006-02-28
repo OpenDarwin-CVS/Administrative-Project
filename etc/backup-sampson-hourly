@@ -1,0 +1,13 @@
+#!/bin/sh
+
+. /etc/backup-common
+
+## Backup Mysql databases
+##
+FILE=mysql.hourly
+if cd /Volumes/src2/backups/mysql; then
+    RotateBackups "${FILE}.gz"
+    export MYSQL_PWD=$(head -n 1 /var/opendarwin/secrets/backup_mysql_secret)
+    /usr/bin/mysqldump --all -uroot --result-file=$FILE --all-databases
+    [ -f $FILE ] && gzip -9 $FILE
+fi

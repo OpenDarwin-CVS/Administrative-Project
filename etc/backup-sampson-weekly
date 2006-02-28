@@ -1,0 +1,8 @@
+#!/bin/sh
+
+. /etc/backup-common
+
+if cd /Volumes/src2/backups/mysql; then
+    RotateBackups mysql.weekly.gz
+    ln mysql.daily.gz mysql.weekly.gz
+fi
