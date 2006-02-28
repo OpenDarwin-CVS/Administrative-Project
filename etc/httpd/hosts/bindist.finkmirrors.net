@@ -1,0 +1,22 @@
+<VirtualHost 204.152.184.197>
+ServerName bindist.finkmirrors.net
+ServerAdmin bbraun@opendarwin.org
+DocumentRoot /Volumes/src2/fink/finkbindist
+
+ErrorLog /Volumes/src/logs/httpd/bindist.finkmirrors.net-error.log
+TransferLog /Volumes/src/logs/httpd/bindist.finkmirrors.net-access.log
+LogFormat "%{Referer}i -> %U" referer
+LogFormat "%{User-agent}i" agent
+CustomLog /Volumes/src/logs/httpd/bindist.finkmirrors.net-referer.log referer
+CustomLog /Volumes/src/logs/httpd/bindist.finkmirrors.net-agent.log agent
+
+<Directory "/Volumes/src2/fink/finkbindist">
+    AllowOverride All
+    Options Indexes FollowSymLinks MultiViews Includes
+DAV on
+</Directory>
+<Directory "/Volumes/src/distfiles">
+    AllowOverride All
+    Options Indexes FollowSymLinks MultiViews Includes
+</Directory>
+</VirtualHost>

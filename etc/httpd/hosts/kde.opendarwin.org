@@ -1,0 +1,9 @@
+<VirtualHost 204.152.184.197>
+ServerName kde.opendarwin.org
+ServerAdmin admin@opendarwin.org
+DocumentRoot /Volumes/src/kde
+<Directory "/Volumes/src/kde">
+    Options Indexes FollowSymLinks MultiViews Includes
+DAV on
+</Directory>
+</VirtualHost>

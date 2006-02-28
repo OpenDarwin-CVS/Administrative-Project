@@ -1,11 +1,14 @@
-<VirtualHost 204.152.184.200>
+<VirtualHost 204.152.184.197>
 ServerName darwinsource.opendarwin.org
-ServerAdmin bbraun@opendarwin.org
+ServerAdmin admin@opendarwin.org
 DocumentRoot /Volumes/src/darwinsource
 AddHandler server-parsed .html
 <Directory "/Volumes/src/darwinsource">
     Options Indexes FollowSymLinks MultiViews Includes
-DAV on
+    DAV on
 </Directory>
+<Directory "/Volumes/src/darwinsource/cgi-bin">
+    Options ExecCGI
+</Directory>
+ScriptAlias /cgi-bin/ "/Volumes/src/darwinsource/cgi-bin/"
 </VirtualHost>
-

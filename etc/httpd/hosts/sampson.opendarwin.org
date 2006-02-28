@@ -1,0 +1,15 @@
+<VirtualHost 204.152.184.197>
+ServerName sampson.opendarwin.org
+ServerAdmin admin@opendarwin.org
+DocumentRoot /Library/WebServer/Documents
+<Directory "/Library/WebServer/Documents">
+        AllowOverride All
+        Options All ExecCGI
+</Directory>
+RewriteEngine on
+RewriteRule /mailman/$ /usr/share/mailman/cgi-bin/index.cgi
+RewriteRule /mailman$  /usr/share/mailman/cgi-bin/index.cgi
+
+
+Include /etc/httpd/httpd_mailman.conf
+</VirtualHost>

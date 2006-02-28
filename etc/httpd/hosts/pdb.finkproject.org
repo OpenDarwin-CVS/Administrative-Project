@@ -1,0 +1,14 @@
+<VirtualHost 204.152.184.197>
+ServerName pdb.finkproject.org
+ServerAdmin bbraun@opendarwin.org
+DocumentRoot /Volumes/src2/fink/pdb.finkproject.org/htdocs
+<Directory "/Volumes/src2/fink/pdb.finkproject.org/htdocs">
+    Options Indexes FollowSymLinks MultiViews Includes
+</Directory>
+ErrorLog /Volumes/src/logs/httpd/pdb.finkproject.org-error.log
+TransferLog /Volumes/src/logs/httpd/pdb.finkproject.org-access.log
+LogFormat "%{Referer}i -> %U" referer
+LogFormat "%{User-agent}i" agent
+CustomLog /Volumes/src/logs/httpd/pdb.finkproject.org-referer.log referer
+CustomLog /Volumes/src/logs/httpd/pdb.finkproject.org-agent.log agent
+</VirtualHost>

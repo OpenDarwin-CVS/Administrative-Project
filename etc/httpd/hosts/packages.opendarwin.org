@@ -1,12 +1,16 @@
-<VirtualHost 204.152.184.200>
+<VirtualHost 204.152.184.197>
 ServerName packages.opendarwin.org
-ServerAdmin bbraun@opendarwin.org
-#DocumentRoot /Library/WebServer/Documents/projects/darwinports/packages
+ServerAdmin admin@opendarwin.org
 DocumentRoot /Volumes/src/packages
 <Directory "/Volumes/src/packages">
     AllowOverride All
     Options Indexes FollowSymLinks MultiViews Includes
 DAV on
 </Directory>
+ErrorLog /Volumes/src/logs/httpd/packages.opendarwin.org-error.log
+TransferLog /Volumes/src/logs/httpd/packages.opendarwin.org-access.log
+LogFormat "%{Referer}i -> %U" referer
+LogFormat "%{User-agent}i" agent
+CustomLog /Volumes/src/logs/httpd/packages.opendarwin.org-referer.log referer
+CustomLog /Volumes/src/logs/httpd/packages.opendarwin.org-agent.log agent
 </VirtualHost>
-

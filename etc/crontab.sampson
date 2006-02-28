@@ -1,0 +1,34 @@
+# The periodic and atrun jobs have moved to launchd jobs
+# See /System/Library/LaunchDaemons
+#
+# minute	hour	mday	month	wday	who	command
+
+# Replicate LDAP among the hosts hourly
+0	*	*	*	*	root	/usr/local/bin/ldap_export.sh > /dev/null 2>&1
+
+# This updates the appropriate fink .info and .patch files for fink selfupdate
+0,30	*	*	*	*	root	/usr/local/bin/finkrsyncup > /dev/null 2>&1
+
+# These cron jobs bring over the darwinports portfiles to be served via
+# rsync for port selfupdate.
+5,35	*	*	*	*	root	rsync -a --delete -e 'ssh -i /var/root/.ssh/id_dsa.opendarwin' dulcinea.opendarwin.org:/Volumes/bigsrc/darwinports/dp1.0/ /Volumes/src2/darwinports/dp1.0/ 2>&1 | mail -E -s rsync-release yeled@opendarwin.org
+10,40	*	*	*	*	root	rsync -a --delete -e 'ssh -i /var/root/.ssh/id_dsa.opendarwin' dulcinea.opendarwin.org:/Volumes/bigsrc/darwinports/dp/ /Volumes/src2/darwinports/dp/ 2>&1 | mail -E -s rsync-head yeled@opendarwin.org 
+
+
+45	6,18	*	*	*	root	/usr/local/bin/newmirror 2>&1 | mail -s mirroring distfile-msgs@opendarwin.org
+
+*/5	*	*	*	*	root	/sw/bin/mrtg /usr/local/etc/mrtg.cfg
+#0	17	*	*	*	root	scp -i /var/root/.ssh/id_dsa.opendarwin -q lamancha.opendarwin.org:/Users/pogma/public_html/libtool.tar.gz /Volumes/src/libtool/ > /dev/null 2>&1
+
+# this updates the release.opendarwin.org virtual host
+40	16	*	*	*	root	/usr/local/bin/releasesync 2>&1 | mail -s "release.opendarwin.org update" ssen@opendarwin.org
+0	0,8,16	*	*	*	drm	 /Volumes/src2/fink/pdb.finkproject.org/pdb/pdb_full_update-piecewise 2>&1 | tee -a /Volumes/src2/fink/logs/cron.log | mail -s "Web-PDB Update `date`" fink-auto-logs@lists.sourceforge.net
+
+
+###
+### Backup MySQL database
+###
+20	*/6	*	*	*	root	/etc/backup-sampson-hourly
+10	20	*	*	*	root	/etc/backup-sampson-daily
+5	3	*	*	6	root	/etc/backup-sampson-weekly
+1	3	1	*	*	root	/etc/backup-sampson-monthly

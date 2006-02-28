@@ -1,18 +1,60 @@
-<VirtualHost 204.152.184.200>
+<VirtualHost 204.152.184.197>
 ServerName www.opendarwin.org
-ServerAdmin bbraun@opendarwin.org
+ServerAdmin admin@opendarwin.org
 DocumentRoot /Library/WebServer/Documents
+Alias /pipermail/ /var/mailman/archives/public/
 RewriteEngine on
-RewriteRule /mailman/$ /Users/mailman/cgi-bin/index.cgi
-RewriteRule /mailman$  /Users/mailman/cgi-bin/index.cgi
+RewriteRule /mailman/$ /usr/share/mailman/cgi-bin/index.cgi
+RewriteRule /mailman$  /usr/share/mailman/cgi-bin/index.cgi
 Redirect /projects/darwinports/packages http://packages.opendarwin.org/
 Redirect /projects/darwinports/distfiles http://distfiles.opendarwin.org/
 
+#
+# Redirect from old PHP pages to shiny new XHTML ones
+#
+Redirect /index.php http://www.opendarwin.org/
+Redirect /bugzilla/index.php http://www.opendarwin.org/en/bugzilla/
+Redirect /downloads/index.php http://www.opendarwin.org/en/downloads/
+Redirect /en/about.php http://www.opendarwin.org/en/about.html
+Redirect /en/accounts.php http://www.opendarwin.org/en/accounts.html
+Redirect /en/coreteam.php http://www.opendarwin.org/en/coreteam.html
+Redirect /en/developers.php http://www.opendarwin.org/en/developers.html
+Redirect /en/donations.php http://www.opendarwin.org/en/donations.html
+Redirect /en/hexley.php http://www.opendarwin.org/en/hexley.html
+Redirect /en/index.php http://www.opendarwin.org/en/
+Redirect /en/mirrors.php http://www.opendarwin.org/en/mirrors.html
+Redirect /en/news.php http://www.opendarwin.org/en/news/
+Redirect /projects/index.php http://www.opendarwin.org/en/projects.html
+Redirect /en/projects.php http://www.opendarwin.org/en/projects.html
+Redirect /en/wallofshame.php http://www.opendarwin.org/en/wallofshame.html
+Redirect /en/yum.php http://www.opendarwin.org/en/yum.html
+Redirect /en/plus.php http://www.opendarwin.org/en/plus.html
 Redirect /en/cvs.php http://www.opendarwin.org/doc/en/articles/opendarwin/cvs_howto/
-Redirect /en/cvs_guidelines.php http://www.opendarwin.org/doc/en/articles/opendarwin/cvs_guidelines/
-Redirect /en/committer_guide.php http://www.opendarwin.org/doc/en/articles/opendarwin/committer_guide/
+Redirect /en/cvs_guidelines.php http://www.opendarwin.org/en/articles/cvs_guidelines/
+Redirect /en/committer_guide.php http://www.opendarwin.org/en/articles/committer_guide/
 
+Redirect /faq http://www.opendarwin.org/en/faq/
+Redirect /en/faq.php http://www.opendarwin.org/en/faq/
+Redirect /documentation http://www.opendarwin.org/en/articles
+Redirect /en/articles/index.php http://www.opendarwin.org/en/articles
 
+RewriteRule ^/projects/darwine(.*) http://darwine.opendarwin.org/$1 [R]
+
+RewriteRule ^/cgi-bin/cvsweb.cgi(.*) http://cvs.opendarwin.org/$0 [R]
+RewriteRule ^/projects/darwinports/(.*) http://darwinports.opendarwin.org/ [R]
+RewriteRule ^/en/projects/darwinports/(.*) http://darwinports.opendarwin.org/ [R]
+RewriteRule ^/en/updateprofile.php https://www.opendarwin.org/en/updateprofile.php [R]
+RewriteRule ^/fr/updateprofile.php https://www.opendarwin.org/fr/updateprofile.php [R]
+RewriteRule ^/ru/updateprofile.php https://www.opendarwin.org/ru/updateprofile.php [R]
+RewriteRule ^/jp/updateprofile.php https://www.opendarwin.org/jp/updateprofile.php [R]
+RewriteRule ^/en/application.php https://www.opendarwin.org/en/application.php [R]
+RewriteRule ^/fr/application.php https://www.opendarwin.org/fr/application.php [R]
+RewriteRule ^/ru/application.php https://www.opendarwin.org/ru/application.php [R]
+RewriteRule ^/jp/application.php https://www.opendarwin.org/jp/application.php [R]
+#Redirect /cgi-bin/cvsweb.cgi$ http://cvs.opendarwin.org/index.cgi$1
+
+RewriteRule ^/bugzilla(.*) http://bugzilla.opendarwin.org$1 [R=permanent]
+RewriteRule ^/wiki(.*) http://wiki.opendarwin.org$1 [R=permanent]
 
 </VirtualHost>
 

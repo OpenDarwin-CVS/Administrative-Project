@@ -1,0 +1,6 @@
+<VirtualHost 204.152.184.197>
+ServerName wiki.opendarwin.org
+ServerAdmin admin@opendarwin.org
+DocumentRoot /Library/WebServer/Wiki
+</VirtualHost>
+

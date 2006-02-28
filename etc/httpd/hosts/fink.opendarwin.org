@@ -1,8 +1,14 @@
-<VirtualHost 204.152.184.200>
+<VirtualHost 204.152.184.197>
 ServerName fink.opendarwin.org
 ServerAdmin bbraun@opendarwin.org
-DocumentRoot /Volumes/src/fink
-<Directory "/Volumes/src/fink">
+DocumentRoot /Volumes/src2/fink/fink.opendarwin.org/htdocs
+<Directory "/Volumes/src2/fink/fink.opendarwin.org/htdocs">
     Options Indexes FollowSymLinks MultiViews Includes
 </Directory>
+ErrorLog /Volumes/src/logs/httpd/fink.opendarwin.org-error.log
+TransferLog /Volumes/src/logs/httpd/fink.opendarwin.org-access.log
+LogFormat "%{Referer}i -> %U" referer
+LogFormat "%{User-agent}i" agent
+CustomLog /Volumes/src/logs/httpd/fink.opendarwin.org-referer.log referer
+CustomLog /Volumes/src/logs/httpd/fink.opendarwin.org-agent.log agent
 </VirtualHost>

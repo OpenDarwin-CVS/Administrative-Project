@@ -1,0 +1,15 @@
+<VirtualHost 204.152.184.197:443>
+ServerName admin.opendarwin.org
+ServerAdmin admin@opendarwin.org
+DocumentRoot /Library/WebServer/Admin
+
+SSLEngine on
+SSLCertificateFile /var/opendarwin/secrets/admin.opendarwin.org.crt
+SSLCertificateKeyFile /var/opendarwin/secrets/admin.opendarwin.org.key
+SSLVerifyClient none
+
+<Directory "/Library/WebServer/Admin">
+        AllowOverride All
+        Options All ExecCGI
+</Directory>
+</VirtualHost>

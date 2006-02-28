@@ -1,0 +1,14 @@
+<VirtualHost 204.152.184.197>
+ServerName apt.opendarwin.org
+ServerAdmin bbraun@opendarwin.org
+DocumentRoot /Volumes/src2/fink/finkbindist
+<Directory "/Volumes/src2/fink/finkbindist">
+    AllowOverride All
+    Options Indexes FollowSymLinks MultiViews Includes
+DAV on
+</Directory>
+<Directory "/Volumes/src/distfiles">
+    AllowOverride All
+    Options Indexes FollowSymLinks MultiViews Includes
+</Directory>
+</VirtualHost>

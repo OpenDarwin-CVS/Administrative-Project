@@ -1,8 +1,8 @@
 <VirtualHost 204.152.184.197>
-ServerName bugzilla.opendarwin.org
+ServerName release.opendarwin.org
 ServerAdmin admin@opendarwin.org
-DocumentRoot /Library/WebServer/Bugzilla
-<Directory "/Library/WebServer/Bugzilla">
+DocumentRoot /Volumes/src/release
+<Directory "/Volumes/src/release">
         AllowOverride All
         Options All ExecCGI
 </Directory>

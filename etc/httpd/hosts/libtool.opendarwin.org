@@ -1,0 +1,8 @@
+<VirtualHost 204.152.184.197>
+ServerName libtool.opendarwin.org
+ServerAdmin admin@opendarwin.org
+DocumentRoot /Volumes/src/libtool
+<Directory /Volumes/src/libtool>
+	Options Indexes
+</Directory>
+</VirtualHost>

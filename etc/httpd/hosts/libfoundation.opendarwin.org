@@ -1,0 +1,6 @@
+<VirtualHost 204.152.184.197>
+ServerName libfoundation.opendarwin.org
+ServerAdmin admin@opendarwin.org
+DocumentRoot /Library/WebServer/Documents/projects/libfoundation/
+</VirtualHost>
+
