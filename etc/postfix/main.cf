@@ -65,7 +65,7 @@ mail_owner = postfix
 # other configuration parameters.
 #
 #myhostname = host.domain.tld
-myhostname = sancho.opendarwin.org
+myhostname = sampson.opendarwin.org
 
 # The mydomain parameter specifies the local internet domain name.
 # The default is to use $myhostname minus the first component.
@@ -151,8 +151,9 @@ inet_interfaces = all
 #
 #mydestination = $myhostname, localhost.$mydomain
 #mydestination = $myhostname, localhost.$mydomain $mydomain
+#mydestination = $myhostname, localhost.$mydomain, $mydomain,
 mydestination = $myhostname, localhost.$mydomain, $mydomain,
-	mail.$mydomain, www.$mydomain, ftp.$mydomain
+	mail.$mydomain, www.$mydomain, ftp.$mydomain, metapkg.org, lists.finkproject.org, bugs.finkproject.org, cvs.opendarwin.org, dulcinea.opendarwin.org, lamancha.opendarwin.org, dapple.opendarwin.org, anoncvs.opendarwin.org
 
 # REJECTING MAIL FOR UNKNOWN LOCAL USERS
 #
@@ -196,9 +197,11 @@ virtual_alias_maps = hash:/etc/postfix/virtual
 # In the left-hand side, specify a bare username, an @domain.tld
 # wild-card, or specify a user@domain.tld address.
 # 
-local_recipient_maps = unix:passwd.byname $alias_maps
+#local_recipient_maps = unix:passwd.byname $alias_maps
 #local_recipient_maps = proxy:unix:passwd.byname $alias_maps
-#local_recipient_maps =
+
+# Must not set, as no way to allow all msgs to get to debbugs
+local_recipient_maps =
 
 # The unknown_local_recipient_reject_code specifies the SMTP server
 # response code when a recipient domain matches $mydestination or
@@ -319,7 +322,8 @@ mynetworks_style = host
 # In the left-hand side, specify an @domain.tld wild-card, or specify
 # a user@domain.tld address.
 # 
-#relay_recipient_maps = hash:/etc/postfix/relay_recipients
+# kvv added 2/15/06
+relay_recipient_maps = hash:/etc/postfix/relay_recipients
 
 # INPUT RATE CONTROL
 #
@@ -380,6 +384,7 @@ mynetworks_style = host
 #alias_maps = hash:/etc/aliases
 #alias_maps = hash:/etc/aliases, nis:mail.aliases
 #alias_maps = netinfo:/aliases
+alias_maps = hash:/etc/postfix/aliases, hash:/var/mailman/data/aliases
 
 # The alias_database parameter specifies the alias database(s) that
 # are built with "newaliases" or "sendmail -bi".  This is a separate
@@ -672,16 +677,81 @@ tls_random_source = dev:/dev/urandom
 smtpd_sasl_auth_enable = yes
 smtpd_sasl_security_options = noanonymous
 #smtpd_sasl_local_domain = $myhostname
-smtpd_sasl_local_domain = 
+#smtpd_sasl_local_domain = 
 broken_sasl_auth_clients = yes
-smtpd_recipient_restrictions = permit_sasl_authenticated, permit_mynetworks, check_relay_domains
+##(cryo see below) smtpd_recipient_restrictions = permit_sasl_authenticated, permit_mynetworks, check_relay_domains
+smtpd_use_pw_server = yes
+smtpd_pw_server_security_options = plain,login
 
 mailbox_command = /usr/bin/procmail
 mailbox_size_limit = 5120000000
 
 #undo all the lame server options.
-#myhostname = sancho.opendarwin.org
+#myhostname = sampson.opendarwin.org
 #mailbox_transport = cyrus
 #enable_server_options = yes
 #mailbox_transport = cyrus
 enable_server_options = no
+
+transport_maps = hash:/etc/postfix/transport
+
+#XXX Cryo
+default_process_limit = 1024
+smtpd_error_sleep_time = 0
+smtpd_delay_reject = yes
+maximal_queue_lifetime = 5d
+debug_peer_level = 2
+smtpd_error_sleep_time = 50s
+smtpd_hard_error_limit = 100
+smtpd_helo_required = yes
+
+smtp_always_send_ehlo = yes
+smtp_skip_4xx_greeting = no
+smtp_skip_5xx_greeting = no
+smtp_skip_quit_response = no
+strict_rfc821_envelopes = yes
+
+#XXX Cryo - to reduce the number of smtps, dump mail that can't be delivered
+#XXX immediately to dulcinea
+#fallback_relay = dulcinea.opendarwin.org
+# XXX If sampson get really bogged, just dump all mail on dulcinea
+# XXX hack until MX for dulcinea is updated not to point to sampson
+#fallback_relay = 204.152.186.41
+
+smtpd_helo_restrictions = permit_mynetworks,
+        check_helo_access hash:/etc/postfix/helo_checks,
+	reject_non_fqdn_recipient,
+        reject_unknown_recipient_domain,
+        reject_unauth_pipelining,
+        reject_unauth_destination,
+	reject_non_fqdn_hostname, reject_invalid_hostname
+
+#       reject_unknown_hostname
+
+# added by kvv 2/15/06
+#smtpd_reject_unlisted_recipient = yes
+
+# RBL added by kvv 10/18/05
+# More RBLs added by kvv 11/21/05
+smtpd_recipient_restrictions = permit_mynetworks,
+      permit_sasl_authenticated,
+      reject_non_fqdn_sender,
+      reject_non_fqdn_recipient,
+      reject_unknown_recipient_domain,
+      reject_unauth_pipelining,
+      reject_unauth_destination,
+	reject_rbl_client sbl-xbl.spamhaus.org,
+	reject_rbl_client bl.spamcop.net,
+	reject_rbl_client relays.ordb.org,
+	reject_rbl_client opm.blitzed.org,
+	reject_rbl_client list.dsbl.org,
+	reject_rbl_client cbl.abuseat.org,
+	reject_rbl_client dul.dnsbl.sorbs.net,
+	permit
+
+#      check_client_access    hash:/etc/postfix/postgrey_client_access,
+#      check_recipient_access hash:/etc/postfix/postgrey_recipient_access ,
+#      check_policy_service unix:/tmp/postgrey
+
+     # reject_invalid_hostname,
+     # reject_unknown_client,

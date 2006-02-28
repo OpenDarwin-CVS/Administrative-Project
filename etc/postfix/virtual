@@ -1,5 +1,6 @@
 # Nicolai says this MUST go at the top
 # Catch-alls
+@bugs.finkproject.org		debbugs
 metapkg.org			IGNORE
 
 # People
